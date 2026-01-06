@@ -1,4 +1,4 @@
-credentials-file: /etc/cloudflared/creds/credentials.json
+credentials-file: /var/lib/cloudflared/credentials.json
 
 ingress:
   - hostname: id.${DNS_NAME:-home.internal}

@@ -1,26 +1,24 @@
 # home-2021
 
-## Setup `OPS_ROOT`
+## Operations Script
 
-The `OPS_ROOT` environment variable specifies the root directory for all operations. By default, scripts use the current directory (`.`) as the base path.
+All operations are handled by a single unified script `ops.sh` in the project root.
 
 ```bash
-# Use current directory (default)
-./scripts/bootstrap.sh
+# Show usage
+./ops.sh
 
-# Use specific directory
-./scripts/bootstrap.sh ~/ops
-
-# Or set OPS_ROOT environment variable
-export OPS_ROOT=~/ops
-./scripts/bootstrap.sh
+# Commands
+./ops.sh bootstrap              # Initial project setup (run once)
+./ops.sh preflight             # Pre-deployment checks and initialization
+./ops.sh deploy                # Deploy all services
+./ops.sh deploy edge/traefik   # Deploy specific service
+./ops.sh down                  # Stop all services
+./ops.sh down apps/vaultwarden # Stop specific service
+./ops.sh validate edge/traefik # Validate compose.yml
 ```
 
-All `compose.yml` files use `${OPS_ROOT:-.}` for paths, which means:
-- If `OPS_ROOT` is set, it uses that absolute path
-- If not set, it defaults to `.` (current directory where compose.yml is located)
-
-Scripts automatically convert the `ROOT` argument to an absolute path and export it as `OPS_ROOT`.
+The script automatically detects the project root from its location and exports it as `OPS_ROOT`. All `compose.yml` files use `${OPS_ROOT:-.}` for paths.
 
 ## ops layout
 

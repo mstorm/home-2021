@@ -1,0 +1,254 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Unified operations script
+# Automatically detects project root from script location
+
+# Get script directory (which is the project root)
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+export OPS_ROOT="$ROOT"
+
+# Service deployment order
+ORDER=(
+  "edge/traefik"
+  "edge/cloudflared"
+  "data/postgres"
+  "data/redis"
+  "foundation/zitadel"
+  "foundation/headscale"
+  "observability/prometheus"
+  "observability/loki"
+  "observability/promtail"
+  "observability/alertmanager"
+  "observability/grafana"
+  "observability/uptime-kuma"
+  "apps/gitea"
+  "apps/portainer"
+  "apps/registry"
+  "apps/vaultwarden"
+  "apps/n8n"
+  "apps/teslamate"
+  "apps/unifi"
+)
+
+# Helper functions
+require() {
+  command -v "$1" >/dev/null 2>&1 || { echo "Missing: $1"; exit 1; }
+}
+
+# Find compose file in a directory
+# Returns the compose file path or empty string if not found
+# Exits with error if multiple compose files are found
+find_compose_file() {
+  local dir="$1"
+  local files=()
+  # Docker Compose standard file names (in priority order)
+  local compose_files=(
+    "compose.yml"
+    "compose.yaml"
+    "docker-compose.yml"
+    "docker-compose.yaml"
+  )
+  local file
+  
+  # Check all possible compose file names
+  for file in "${compose_files[@]}"; do
+    [[ -f "$dir/$file" ]] && files+=("$file")
+  done
+  
+  # Error if multiple files found
+  if [[ ${#files[@]} -gt 1 ]]; then
+    echo "Error: Multiple compose files found in $dir:" >&2
+    for f in "${files[@]}"; do
+      echo "  - $f" >&2
+    done
+    echo "Please remove duplicate files." >&2
+    exit 1
+  fi
+  
+  # Return the found file or empty string
+  [[ ${#files[@]} -eq 1 ]] && echo "${files[0]}"
+}
+
+up_unit() {
+  local u="$1"
+  local unit_dir="$ROOT/srv/$u"
+  local compose_file
+  
+  echo "up: $u"
+  cd "$unit_dir"
+  
+  compose_file="$(find_compose_file "$unit_dir")"
+  if [[ -z "$compose_file" ]]; then
+    echo "Error: No compose file found in $unit_dir" >&2
+    exit 1
+  fi
+  
+  docker compose -f "$compose_file" up -d
+}
+
+down_unit() {
+  local u="$1"
+  local unit_dir="$ROOT/srv/$u"
+  local compose_file
+  
+  echo "down: $u"
+  cd "$unit_dir"
+  
+  compose_file="$(find_compose_file "$unit_dir")"
+  if [[ -z "$compose_file" ]]; then
+    echo "Error: No compose file found in $unit_dir" >&2
+    exit 1
+  fi
+  
+  docker compose -f "$compose_file" down
+}
+
+# Commands
+cmd_bootstrap() {
+  echo "bootstrap: $ROOT"
+  
+  # Create directory structure
+  mkdir -p "$ROOT"/{srv,etc,lib,run,shared,docs,scripts}
+  mkdir -p "$ROOT"/run/{tmp,lock,logs,state}
+  mkdir -p "$ROOT"/shared/{backups,uploads,artifacts}
+  
+  # Create Docker networks (idempotent)
+  if ! docker network inspect net_external >/dev/null 2>&1; then
+    docker network create net_external
+  fi
+  if ! docker network inspect net_internal >/dev/null 2>&1; then
+    docker network create net_internal
+  fi
+  
+  # Traefik ACME storage
+  mkdir -p "$ROOT/lib/traefik"
+  touch "$ROOT/lib/traefik/acme.json"
+  chmod 600 "$ROOT/lib/traefik/acme.json"
+  
+  echo "bootstrap complete"
+}
+
+cmd_preflight() {
+  echo "preflight: $ROOT"
+  
+  # Check dependencies
+  require docker
+  docker compose version >/dev/null 2>&1 || { echo "Missing docker compose plugin"; exit 1; }
+  
+  # Ensure Docker networks exist
+  if ! docker network inspect net_external >/dev/null 2>&1; then
+    docker network create net_external
+  fi
+  if ! docker network inspect net_internal >/dev/null 2>&1; then
+    docker network create net_internal
+  fi
+  
+  # Run init.sh in canonical order
+  for u in "${ORDER[@]}"; do
+    if [[ -f "$ROOT/srv/$u/init.sh" ]]; then
+      echo "init: $u"
+      bash "$ROOT/srv/$u/init.sh" "$ROOT"
+    fi
+  done
+  
+  echo "preflight complete"
+}
+
+cmd_deploy() {
+  local unit="${1:-all}"
+  
+  if [[ "$unit" == "all" ]]; then
+    for u in "${ORDER[@]}"; do
+      # Check if any compose file exists
+      if find_compose_file "$ROOT/srv/$u" >/dev/null 2>&1; then
+        up_unit "$u"
+      fi
+    done
+  else
+    up_unit "$unit"
+  fi
+}
+
+cmd_down() {
+  local unit="${1:-all}"
+  
+  if [[ "$unit" == "all" ]]; then
+    # Reverse order for shutdown
+    for ((idx=${#ORDER[@]}-1 ; idx>=0 ; idx--)); do
+      u="${ORDER[$idx]}"
+      # Check if any compose file exists
+      if find_compose_file "$ROOT/srv/$u" >/dev/null 2>&1; then
+        down_unit "$u"
+      fi
+    done
+  else
+    down_unit "$unit"
+  fi
+}
+
+cmd_validate() {
+  local unit="${1:-}"
+  local unit_dir="$ROOT/srv/$unit"
+  local compose_file
+  
+  if [[ -z "$unit" ]]; then
+    echo "Usage: $0 validate <unit-path>"
+    echo "Example: $0 validate edge/traefik"
+    exit 2
+  fi
+  
+  cd "$unit_dir"
+  
+  compose_file="$(find_compose_file "$unit_dir")"
+  if [[ -z "$compose_file" ]]; then
+    echo "Error: No compose file found in $unit_dir" >&2
+    exit 1
+  fi
+  
+  docker compose -f "$compose_file" config >/dev/null
+  echo "OK: $unit"
+}
+
+# Main command dispatcher
+COMMAND="${1:-}"
+TARGET="${2:-}"
+
+case "$COMMAND" in
+  bootstrap)
+    cmd_bootstrap
+    ;;
+  preflight)
+    cmd_preflight
+    ;;
+  deploy)
+    cmd_deploy "$TARGET"
+    ;;
+  down)
+    cmd_down "$TARGET"
+    ;;
+  validate)
+    cmd_validate "$TARGET"
+    ;;
+  *)
+    echo "Usage: $0 <command> [target]"
+    echo ""
+    echo "Commands:"
+    echo "  bootstrap              - Initial project setup (run once)"
+    echo "  preflight              - Pre-deployment checks and initialization"
+    echo "  deploy [unit|all]      - Deploy services (default: all)"
+    echo "  down [unit|all]        - Stop services (default: all)"
+    echo "  validate <unit>       - Validate compose.yml for a service"
+    echo ""
+    echo "Examples:"
+    echo "  $0 bootstrap"
+    echo "  $0 preflight"
+    echo "  $0 deploy"
+    echo "  $0 deploy edge/traefik"
+    echo "  $0 down"
+    echo "  $0 down apps/vaultwarden"
+    echo "  $0 validate edge/traefik"
+    exit 1
+    ;;
+esac
+

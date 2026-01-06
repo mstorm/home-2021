@@ -16,7 +16,7 @@ services:
       "
     volumes:
       - ${OPS_ROOT:-.}/srv/edge/cloudflared/config:/etc/cloudflared:ro
-      - ${OPS_ROOT:-.}/lib/cloudflared:/etc/cloudflared/creds:ro
+      - ${OPS_ROOT:-.}/lib/cloudflared:/var/lib/cloudflared:ro
     networks:
       - net_external
 
