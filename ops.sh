@@ -70,6 +70,40 @@ find_compose_file() {
   [[ ${#files[@]} -eq 1 ]] && echo "${files[0]}"
 }
 
+# Load env files for Docker Compose variable substitution
+load_env_files() {
+  local compose_file="$1"
+  local unit_dir="$2"
+  
+  # Extract env_file paths from compose.yml
+  local in_env_file=false
+  while IFS= read -r line; do
+    if [[ "$line" =~ env_file: ]]; then
+      in_env_file=true
+      continue
+    fi
+    if [[ "$in_env_file" == true ]]; then
+      if [[ "$line" =~ ^[[:space:]]*-[[:space:]]*(.+) ]]; then
+        local env_path="${BASH_REMATCH[1]}"
+        # Resolve OPS_ROOT variable
+        env_path="${env_path//\$\{OPS_ROOT:-../../\}/$ROOT}"
+        # Resolve relative paths from unit_dir
+        if [[ "$env_path" != /* ]]; then
+          env_path="$(cd "$unit_dir" && cd "$(dirname "$env_path")" && pwd)/$(basename "$env_path")"
+        fi
+        if [[ -f "$env_path" ]]; then
+          set -a
+          source "$env_path"
+          set +a
+        fi
+      elif [[ "$line" =~ ^[[:space:]]*[a-zA-Z] ]] && [[ ! "$line" =~ ^[[:space:]]*- ]]; then
+        # End of env_file section
+        break
+      fi
+    fi
+  done < "$compose_file"
+}
+
 up_unit() {
   local u="$1"
   local unit_dir="$ROOT/srv/$u"
@@ -90,6 +124,9 @@ up_unit() {
     echo "Error: No compose file found in $unit_dir" >&2
     exit 1
   fi
+  
+  # Load env files for Docker Compose variable substitution
+  load_env_files "$compose_file" "$unit_dir"
   
   # Use up with --force-recreate to apply config/env changes
   OPS_ROOT="$ROOT" docker compose -f "$compose_file" up -d --force-recreate
