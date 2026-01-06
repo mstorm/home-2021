@@ -11,8 +11,11 @@ services:
       - ${OPS_ROOT:-../../../}/lib/portainer:/data
     networks: [net_internal]
     labels:
-      - caddy=${PORTAINER_HOST}
-      - caddy.reverse_proxy=portainer:9000
+      - traefik.enable=true
+      - traefik.http.routers.portainer.rule=Host(`${PORTAINER_HOST}`)
+      - traefik.http.routers.portainer.entrypoints=websecure
+      - traefik.http.routers.portainer.tls=true
+      - traefik.http.services.portainer.loadbalancer.server.port=9000
 
 networks:
   net_internal:

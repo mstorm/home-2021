@@ -10,7 +10,8 @@ export OPS_ROOT="$ROOT"
 
 # Service deployment order
 ORDER=(
-  "edge/caddy"
+  "edge/lego"
+  "edge/traefik"
   "edge/cloudflared"
   "data/postgres"
   "data/redis"

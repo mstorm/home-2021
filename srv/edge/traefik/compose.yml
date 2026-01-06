@@ -1,0 +1,42 @@
+services:
+  traefik:
+    image: traefik:v3.0
+    container_name: traefik
+    restart: unless-stopped
+    env_file:
+      - ${OPS_ROOT:-../../../}/etc/global.env
+    command:
+      - --api.dashboard=true
+      - --api.insecure=true
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+      - --providers.docker.network=net_external
+      - --providers.docker.endpoint=unix:///var/run/docker.sock
+      - --entrypoints.web.address=:80
+      - --entrypoints.websecure.address=:443
+      - --entrypoints.web.http.redirections.entrypoint.to=websecure
+      - --entrypoints.web.http.redirections.entrypoint.scheme=https
+      - --certificatesstores.default.certificatestores.file.directory=/certs
+      - --certificatesstores.default.certificatestores.file.watch=true
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8080:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ${OPS_ROOT:-../../../}/lib/traefik:/data
+      - ${OPS_ROOT:-../../../}/lib/certs:/certs:ro
+    environment:
+      - CF_DNS_API_TOKEN=${CLOUDFLARE_DNS_API_TOKEN}
+    networks:
+      - net_external
+      - net_internal
+
+networks:
+  net_external:
+    external: true
+    name: net_external
+  net_internal:
+    external: true
+    name: net_internal
+

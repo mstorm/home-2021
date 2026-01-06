@@ -11,8 +11,11 @@ services:
       - ${OPS_ROOT:-../../../}/srv/observability/grafana/provisioning:/etc/grafana/provisioning:ro
     networks: [net_internal]
     labels:
-      - caddy=grafana.home.mstorm.net
-      - caddy.reverse_proxy=grafana:3000
+      - traefik.enable=true
+      - traefik.http.routers.grafana.rule=Host(`grafana.home.mstorm.net`)
+      - traefik.http.routers.grafana.entrypoints=websecure
+      - traefik.http.routers.grafana.tls=true
+      - traefik.http.services.grafana.loadbalancer.server.port=3000
 
 networks:
   net_internal:

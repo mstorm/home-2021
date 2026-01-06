@@ -10,8 +10,11 @@ services:
       - ${OPS_ROOT:-../../../}/lib/n8n:/home/node/.n8n
     networks: [net_internal]
     labels:
-      - caddy=${N8N_HOST}
-      - caddy.reverse_proxy=n8n:5678
+      - traefik.enable=true
+      - traefik.http.routers.n8n.rule=Host(`${N8N_HOST}`)
+      - traefik.http.routers.n8n.entrypoints=websecure
+      - traefik.http.routers.n8n.tls=true
+      - traefik.http.services.n8n.loadbalancer.server.port=5678
 
 networks:
   net_internal:

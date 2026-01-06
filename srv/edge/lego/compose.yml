@@ -1,0 +1,30 @@
+services:
+  lego:
+    image: goacme/lego:v4.14.2
+    container_name: lego
+    restart: unless-stopped
+    env_file:
+      - ${OPS_ROOT:-../../../}/etc/global.env
+    command:
+      - run
+      - --dns=cloudflare
+      - --email=${LE_EMAIL}
+      - --domains=mstorm.net
+      - --domains=*.mstorm.net
+      - --domains=*.home.mstorm.net
+      - --path=/data
+      - --certificates-path=/certs
+      - --accept-tos
+    volumes:
+      - ${OPS_ROOT:-../../../}/lib/lego:/data
+      - ${OPS_ROOT:-../../../}/lib/certs:/certs
+    environment:
+      - CLOUDFLARE_DNS_API_TOKEN=${CLOUDFLARE_DNS_API_TOKEN}
+    networks:
+      - net_internal
+
+networks:
+  net_internal:
+    external: true
+    name: net_internal
+

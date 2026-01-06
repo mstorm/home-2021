@@ -25,9 +25,6 @@ services:
       - ${OPS_ROOT:-../../../}/etc/srv/apps.unifi.env
     volumes:
       - ${OPS_ROOT:-../../../}/lib/unifi:/config
-    labels:
-      - caddy=unifi.home.mstorm.net
-      - caddy.reverse_proxy=localhost:8443
 
 networks:
   net_internal:
