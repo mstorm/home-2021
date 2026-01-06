@@ -1,16 +1,15 @@
 http:
   routers:
-    # Bootstrap certificate for mstorm.net, *.mstorm.net, and *.home.mstorm.net
+    # Bootstrap certificate for home.mstorm.net and *.home.mstorm.net
     tls-bootstrap:
-      rule: Host(`tls-bootstrap.${PARENT_DNS_NAME:-internal}`)
+      rule: Host(`tls-bootstrap.${DNS_NAME:-home.internal}`)
       entryPoints: [websecure]
       service: noop
       tls:
         certResolver: le-dns
         domains:
-          - main: "${PARENT_DNS_NAME:-internal}"
+          - main: "${DNS_NAME:-home.internal}"
             sans:
-              - "*.${PARENT_DNS_NAME:-internal}"
               - "*.${DNS_NAME:-home.internal}"
 
   services:

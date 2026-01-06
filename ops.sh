@@ -137,6 +137,7 @@ up_unit() {
   load_env_files "$compose_file" "$unit_dir"
   
   # Use up with --force-recreate to apply config/env changes
+  # Environment variables loaded by load_env_files are already exported (set -a)
   OPS_ROOT="$ROOT" docker compose -f "$compose_file" up -d --force-recreate
 }
 
