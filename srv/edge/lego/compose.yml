@@ -15,7 +15,6 @@ services:
       - --path=/data
       - --domains=mstorm.net
       - --domains=*.mstorm.net
-      - --domains=home.mstorm.net
       - --domains=*.home.mstorm.net
       - run
     volumes:

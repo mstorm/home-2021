@@ -16,7 +16,7 @@ services:
       - --entrypoints.websecure.address=:443
       - --entrypoints.web.http.redirections.entrypoint.to=websecure
       - --entrypoints.web.http.redirections.entrypoint.scheme=https
-      - --certificatesstores.default.certificatestores.file.directory=/certs
+      - --certificatesstores.default.certificatestores.file.directory=/certs/certificates
       - --certificatesstores.default.certificatestores.file.watch=true
     ports:
       - "80:80"
