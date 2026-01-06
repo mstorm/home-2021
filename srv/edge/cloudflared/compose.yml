@@ -9,7 +9,7 @@ services:
     command: >
       sh -c "
       if [ -n \"$$TUNNEL_TOKEN\" ]; then
-        tunnel --no-autoupdate run
+        tunnel --no-autoupdate run ${TUNNEL_TOKEN}
       else
         tunnel --no-autoupdate run --config /etc/cloudflared/config.yml
       fi
