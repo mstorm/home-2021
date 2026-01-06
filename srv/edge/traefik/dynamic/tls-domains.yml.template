@@ -7,8 +7,9 @@ http:
       tls:
         certResolver: le-dns
         domains:
-          - main: "*.${DNS_NAME:-home.internal}"
+          - main: "${DNS_NAME:-home.internal}"
             sans:
+              - "*.${DNS_NAME:-home.internal}"
               - "*.${PARENT_DNS_NAME:-internal}"
 
   services:
