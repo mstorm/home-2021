@@ -5,11 +5,13 @@ services:
     restart: unless-stopped
     env_file:
       - ${OPS_ROOT:-../../../}/etc/global.env
-      - ${OPS_ROOT:-../../../}/etc/srv/apps.unifi-db.env
+      - ${OPS_ROOT:-../../../}/etc/srv/apps.unifi.env
     volumes:
-      - ${OPS_ROOT:-../../../}/lib/unifi-mongodb:/data/db
-    network_mode: host
-    command: mongod --bind_ip 127.0.0.1
+      - ${OPS_ROOT:-../../../}/lib/unifi/db:/data/db
+    networks:
+      - net_internal
+    ports:
+      - "127.0.0.1:27017:27017"
 
   unifi:
     image: linuxserver/unifi-network-application:latest
@@ -23,3 +25,11 @@ services:
       - ${OPS_ROOT:-../../../}/etc/srv/apps.unifi.env
     volumes:
       - ${OPS_ROOT:-../../../}/lib/unifi:/config
+    labels:
+      - caddy=unifi.home.mstorm.net
+      - caddy.reverse_proxy=localhost:8443
+
+networks:
+  net_internal:
+    external: true
+    name: net_internal

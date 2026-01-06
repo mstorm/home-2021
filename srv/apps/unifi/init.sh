@@ -5,6 +5,6 @@ ROOT="${1:-.}"
 ROOT="$(cd "$ROOT" && pwd)"
 # Ensure generic runtime dirs exist
 mkdir -p "$ROOT/run"/{tmp,lock,logs,state}
-mkdir -p "$ROOT/lib/unifi"
+mkdir -p "$ROOT/lib/unifi"/db
 
 echo "init ok: apps/unifi"

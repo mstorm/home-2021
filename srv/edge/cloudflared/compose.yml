@@ -6,7 +6,6 @@ services:
     command: tunnel --no-autoupdate run --token ${TUNNEL_TOKEN}
     env_file:
       - ${OPS_ROOT:-../../../}/etc/global.env
-      - ${OPS_ROOT:-../../../}/etc/srv/edge.cloudflared.env
     networks:
       - net_external
 

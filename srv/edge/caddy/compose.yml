@@ -7,7 +7,6 @@ services:
     restart: unless-stopped
     env_file:
       - ${OPS_ROOT:-../../../}/etc/global.env
-      - ${OPS_ROOT:-../../../}/etc/srv/edge.caddy.env
     environment:
       - CADDY_INGRESS_NETWORKS=net_external,net_internal
       - CADDY_DOCKER_CERTFILE=/data/caddy/certificates/acme-v02.api.letsencrypt.org-directory/*.crt
