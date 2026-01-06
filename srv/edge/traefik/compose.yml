@@ -6,6 +6,9 @@ services:
     env_file:
       - ${OPS_ROOT:-../../../}/etc/global.env
       - ${OPS_ROOT:-../../../}/etc/srv/edge.traefik.env
+    environment:
+      - LE_EMAIL=${LE_EMAIL}
+      - CF_DNS_API_TOKEN=${CF_DNS_API_TOKEN}
     command:
       - --api.dashboard=true
       - --providers.docker=true
