@@ -92,7 +92,7 @@ up_unit() {
   fi
   
   # Use up with --force-recreate to apply config/env changes
-  docker compose -f "$compose_file" up -d --force-recreate
+  OPS_ROOT="$ROOT" docker compose -f "$compose_file" up -d --force-recreate
 }
 
 down_unit() {
