@@ -1,16 +1,16 @@
 http:
   routers:
     tls-bootstrap:
-      rule: Host(`tls-bootstrap.home.${DNS_NAME:-home.internal}`)
+      rule: Host(`tls-bootstrap.${DNS_NAME:-home.internal}`)
       entryPoints: [websecure]
       service: noop
       tls:
         certResolver: le-dns
         domains:
-          - main: "home.${DNS_NAME:-home.internal}"
+          - main: "${DNS_NAME:-home.internal}"
             sans:
               - "*.${DNS_NAME:-home.internal}"
-              - "*.home.${DNS_NAME:-home.internal}"
+              - "*.${PARENT_DNS_NAME:-internal}"
 
   services:
     noop:

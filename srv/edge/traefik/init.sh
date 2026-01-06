@@ -19,13 +19,21 @@ chmod 600 "$ROOT/lib/traefik/acme.json"
 
 # Process template files and generate actual YAML files
 DNS_NAME="${DNS_NAME:-home.internal}"
-export DNS_NAME
+# Extract parent domain (e.g., home.mstorm.net -> mstorm.net)
+PARENT_DNS_NAME="${DNS_NAME#*.}"
+if [[ "$PARENT_DNS_NAME" == "$DNS_NAME" ]]; then
+  # If no subdomain found, use default
+  PARENT_DNS_NAME="${PARENT_DNS_NAME:-internal}"
+fi
+export DNS_NAME PARENT_DNS_NAME
 
 # Generate YAML files from templates
 for template in "$ROOT/srv/edge/traefik/dynamic"/*.yml.template; do
   if [[ -f "$template" ]]; then
     output="${template%.template}"
-    sed "s/\${DNS_NAME:-home\.internal}/$DNS_NAME/g" "$template" > "$output"
+    sed -e "s/\${DNS_NAME:-home\.internal}/$DNS_NAME/g" \
+        -e "s/\${PARENT_DNS_NAME:-internal}/$PARENT_DNS_NAME/g" \
+        "$template" > "$output"
     echo "Generated: $output"
   fi
 done
