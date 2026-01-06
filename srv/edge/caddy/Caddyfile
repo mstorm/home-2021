@@ -6,6 +6,8 @@
 # Access via: http://localhost:2019/config/ or http://caddy.home.mstorm.net:2019/config/
 {
 	admin localhost:2019
+	email mstorm@mstorm.net
+	acme_dns cloudflare {env.CLOUDFLARE_DNS_API_TOKEN}
 }
 
 # Caddy dashboard (optional, via admin API)
