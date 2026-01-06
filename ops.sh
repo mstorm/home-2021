@@ -108,8 +108,8 @@ down_unit() {
 cmd_bootstrap() {
   echo "bootstrap: $ROOT"
   
-  # Create directory structure
-  mkdir -p "$ROOT"/{srv,etc,lib,run,shared,docs,scripts}
+  # Create directory structure (only non-tracked directories)
+  mkdir -p "$ROOT"/{lib,run,shared}
   mkdir -p "$ROOT"/run/{tmp,lock,logs,state}
   mkdir -p "$ROOT"/shared/{backups,uploads,artifacts}
   
