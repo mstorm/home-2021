@@ -1,5 +1,12 @@
 http:
   routers:
+    traefik:
+      rule: Host(`traefik.${DNS_NAME:-home.internal}`)
+      entryPoints: [websecure]
+      service: api@internal
+      tls:
+        certResolver: le-dns
+
     id:
       rule: Host(`id.${PARENT_DNS_NAME:-internal}`)
       entryPoints: [websecure]
