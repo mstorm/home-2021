@@ -1,0 +1,22 @@
+services:
+  test-env:
+    image: alpine:latest
+    container_name: test-env
+    restart: "no"
+    env_file:
+      - ${OPS_ROOT:-../../../}/etc/global.env
+    command:
+      - sh
+      - -c
+      - |
+        echo "=== Environment Variables ==="
+        echo "LE_EMAIL: ${LE_EMAIL:-NOT SET}"
+        echo "CLOUDFLARE_DNS_API_TOKEN: ${CLOUDFLARE_DNS_API_TOKEN:+SET (hidden)}${CLOUDFLARE_DNS_API_TOKEN:-NOT SET}"
+        echo "DNS_NAME: ${DNS_NAME:-NOT SET}"
+        echo "TZ: ${TZ:-NOT SET}"
+        echo ""
+        echo "=== All env vars (filtered) ==="
+        env | grep -E "(LE_EMAIL|CLOUDFLARE|DNS_NAME|TZ)" | sort
+        echo ""
+        echo "=== Test complete ==="
+
