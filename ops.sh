@@ -156,7 +156,14 @@ cmd_preflight() {
 }
 
 cmd_deploy() {
-  local unit="${1:-all}"
+  local unit="${1:-}"
+  
+  if [[ -z "$unit" ]]; then
+    echo "Usage: $0 deploy <unit|all>"
+    echo "Example: $0 deploy all"
+    echo "Example: $0 deploy edge/traefik"
+    exit 2
+  fi
   
   if [[ "$unit" == "all" ]]; then
     for u in "${ORDER[@]}"; do
@@ -171,7 +178,14 @@ cmd_deploy() {
 }
 
 cmd_down() {
-  local unit="${1:-all}"
+  local unit="${1:-}"
+  
+  if [[ -z "$unit" ]]; then
+    echo "Usage: $0 down <unit|all>"
+    echo "Example: $0 down all"
+    echo "Example: $0 down apps/vaultwarden"
+    exit 2
+  fi
   
   if [[ "$unit" == "all" ]]; then
     # Reverse order for shutdown
@@ -210,9 +224,67 @@ cmd_validate() {
   echo "OK: $unit"
 }
 
+cmd_status() {
+  local unit="${1:-all}"
+  local unit_dir
+  local compose_file
+  
+  if [[ "$unit" == "all" ]]; then
+    # Show status for all services
+    for u in "${ORDER[@]}"; do
+      unit_dir="$ROOT/srv/$u"
+      compose_file="$(find_compose_file "$unit_dir" 2>/dev/null)"
+      if [[ -n "$compose_file" ]]; then
+        echo "=== $u ==="
+        cd "$unit_dir"
+        docker compose -f "$compose_file" ps
+        echo ""
+      fi
+    done
+  else
+    unit_dir="$ROOT/srv/$unit"
+    compose_file="$(find_compose_file "$unit_dir")"
+    if [[ -z "$compose_file" ]]; then
+      echo "Error: No compose file found in $unit_dir" >&2
+      exit 1
+    fi
+    cd "$unit_dir"
+    docker compose -f "$compose_file" ps
+  fi
+}
+
+cmd_logs() {
+  local unit="${1:-}"
+  local service="${2:-}"
+  local unit_dir
+  local compose_file
+  
+  if [[ -z "$unit" ]]; then
+    echo "Usage: $0 logs <unit-path> [service-name]"
+    echo "Example: $0 logs edge/traefik"
+    echo "Example: $0 logs edge/traefik traefik"
+    exit 2
+  fi
+  
+  unit_dir="$ROOT/srv/$unit"
+  compose_file="$(find_compose_file "$unit_dir")"
+  if [[ -z "$compose_file" ]]; then
+    echo "Error: No compose file found in $unit_dir" >&2
+    exit 1
+  fi
+  
+  cd "$unit_dir"
+  if [[ -n "$service" ]]; then
+    docker compose -f "$compose_file" logs -f "$service"
+  else
+    docker compose -f "$compose_file" logs -f
+  fi
+}
+
 # Main command dispatcher
 COMMAND="${1:-}"
 TARGET="${2:-}"
+OPTION="${3:-}"
 
 case "$COMMAND" in
   bootstrap)
@@ -230,23 +302,35 @@ case "$COMMAND" in
   validate)
     cmd_validate "$TARGET"
     ;;
+  status)
+    cmd_status "$TARGET"
+    ;;
+  logs)
+    cmd_logs "$TARGET" "$OPTION"
+    ;;
   *)
-    echo "Usage: $0 <command> [target]"
+    echo "Usage: $0 <command> [target] [options]"
     echo ""
     echo "Commands:"
     echo "  bootstrap              - Initial project setup (run once)"
     echo "  preflight              - Pre-deployment checks and initialization"
-    echo "  deploy [unit|all]      - Deploy services (default: all)"
-    echo "  down [unit|all]        - Stop services (default: all)"
+    echo "  deploy <unit|all>      - Deploy services"
+    echo "  down <unit|all>        - Stop services"
+    echo "  status [unit|all]      - Show service status (default: all)"
+    echo "  logs <unit> [service]  - Show service logs (follow mode)"
     echo "  validate <unit>       - Validate compose.yml for a service"
     echo ""
     echo "Examples:"
     echo "  $0 bootstrap"
     echo "  $0 preflight"
-    echo "  $0 deploy"
+    echo "  $0 deploy all"
     echo "  $0 deploy edge/traefik"
-    echo "  $0 down"
+    echo "  $0 down all"
     echo "  $0 down apps/vaultwarden"
+    echo "  $0 status"
+    echo "  $0 status edge/traefik"
+    echo "  $0 logs edge/traefik"
+    echo "  $0 logs edge/traefik traefik"
     echo "  $0 validate edge/traefik"
     exit 1
     ;;
