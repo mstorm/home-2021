@@ -3,4 +3,3 @@
 	email mstorm@mstorm.net
 	acme_dns cloudflare {env.CLOUDFLARE_DNS_API_TOKEN}
 }
-
