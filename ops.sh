@@ -76,6 +76,13 @@ up_unit() {
   local compose_file
   
   echo "up: $u"
+  
+  # Run init.sh if it exists (for template file generation, etc.)
+  if [[ -f "$ROOT/srv/$u/init.sh" ]]; then
+    echo "init: $u"
+    bash "$ROOT/srv/$u/init.sh" "$ROOT"
+  fi
+  
   cd "$unit_dir"
   
   compose_file="$(find_compose_file "$unit_dir")"
@@ -84,7 +91,8 @@ up_unit() {
     exit 1
   fi
   
-  docker compose -f "$compose_file" up -d
+  # Use up with --force-recreate to apply config/env changes
+  docker compose -f "$compose_file" up -d --force-recreate
 }
 
 down_unit() {
@@ -155,13 +163,13 @@ cmd_preflight() {
   echo "preflight complete"
 }
 
-cmd_deploy() {
+cmd_up() {
   local unit="${1:-}"
   
   if [[ -z "$unit" ]]; then
-    echo "Usage: $0 deploy <unit|all>"
-    echo "Example: $0 deploy all"
-    echo "Example: $0 deploy edge/traefik"
+    echo "Usage: $0 up <unit|all>"
+    echo "Example: $0 up all"
+    echo "Example: $0 up edge/traefik"
     exit 2
   fi
   
@@ -281,6 +289,21 @@ cmd_logs() {
   fi
 }
 
+# Alias: restart = down + up
+cmd_restart() {
+  local unit="${1:-}"
+  
+  if [[ -z "$unit" ]]; then
+    echo "Usage: $0 restart <unit|all>"
+    echo "Example: $0 restart all"
+    echo "Example: $0 restart edge/traefik"
+    exit 2
+  fi
+  
+  cmd_down "$unit"
+  cmd_up "$unit"
+}
+
 # Main command dispatcher
 COMMAND="${1:-}"
 TARGET="${2:-}"
@@ -293,11 +316,14 @@ case "$COMMAND" in
   preflight)
     cmd_preflight
     ;;
-  deploy)
-    cmd_deploy "$TARGET"
+  up)
+    cmd_up "$TARGET"
     ;;
   down)
     cmd_down "$TARGET"
+    ;;
+  restart)
+    cmd_restart "$TARGET"
     ;;
   validate)
     cmd_validate "$TARGET"
@@ -314,8 +340,9 @@ case "$COMMAND" in
     echo "Commands:"
     echo "  bootstrap              - Initial project setup (run once)"
     echo "  preflight              - Pre-deployment checks and initialization"
-    echo "  deploy <unit|all>      - Deploy services"
+    echo "  up <unit|all>          - Start services (runs init.sh, applies config/env changes)"
     echo "  down <unit|all>        - Stop services"
+    echo "  restart <unit|all>    - Restart services (down + up)"
     echo "  status [unit|all]      - Show service status (default: all)"
     echo "  logs <unit> [service]  - Show service logs (follow mode)"
     echo "  validate <unit>       - Validate compose.yml for a service"
@@ -323,10 +350,11 @@ case "$COMMAND" in
     echo "Examples:"
     echo "  $0 bootstrap"
     echo "  $0 preflight"
-    echo "  $0 deploy all"
-    echo "  $0 deploy edge/traefik"
+    echo "  $0 up all"
+    echo "  $0 up edge/traefik"
     echo "  $0 down all"
     echo "  $0 down apps/vaultwarden"
+    echo "  $0 restart edge/traefik"
     echo "  $0 status"
     echo "  $0 status edge/traefik"
     echo "  $0 logs edge/traefik"
