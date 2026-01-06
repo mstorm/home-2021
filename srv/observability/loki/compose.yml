@@ -4,8 +4,8 @@ services:
     container_name: loki
     restart: unless-stopped
     volumes:
-      - ${OPS_ROOT:-../../}/srv/observability/loki/config/loki.yml:/etc/loki/config.yml:ro
-      - ${OPS_ROOT:-../../}/lib/loki:/loki
+      - ${OPS_ROOT:-../../../}/srv/observability/loki/config/loki.yml:/etc/loki/config.yml:ro
+      - ${OPS_ROOT:-../../../}/lib/loki:/loki
     command: ["-config.file=/etc/loki/config.yml"]
     networks: [net_internal]
 

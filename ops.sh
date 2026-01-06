@@ -88,10 +88,12 @@ load_env_files() {
         # Remove quotes if present
         env_path="${env_path#\"}"
         env_path="${env_path%\"}"
-        # Replace ${OPS_ROOT:-../../} with $ROOT using sed
-        env_path=$(echo "$env_path" | sed "s|\${OPS_ROOT:-../../}|$ROOT|g")
-        # If path is relative and starts with ../../, resolve from ROOT
-        if [[ "$env_path" =~ ^\.\./\.\./ ]]; then
+        # Replace ${OPS_ROOT:-../../../} with $ROOT using sed
+        env_path=$(echo "$env_path" | sed "s|\${OPS_ROOT:-\.\.\/\.\.\/\.\.\/}|$ROOT|g")
+        # If path is relative and starts with ../../ or ../../../, resolve from ROOT
+        if [[ "$env_path" =~ ^\.\./\.\./\.\./ ]]; then
+          env_path="$ROOT/${env_path#../../../}"
+        elif [[ "$env_path" =~ ^\.\./\.\./ ]]; then
           env_path="$ROOT/${env_path#../../}"
         elif [[ "$env_path" != /* ]]; then
           # Other relative paths resolve from unit_dir

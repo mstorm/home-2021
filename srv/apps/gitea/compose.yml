@@ -4,10 +4,10 @@ services:
     container_name: gitea
     restart: unless-stopped
     env_file:
-      - ${OPS_ROOT:-../../}/etc/global.env
-      - ${OPS_ROOT:-../../}/etc/srv/apps.gitea.env
+      - ${OPS_ROOT:-../../../}/etc/global.env
+      - ${OPS_ROOT:-../../../}/etc/srv/apps.gitea.env
     volumes:
-      - ${OPS_ROOT:-../../}/lib/gitea:/data
+      - ${OPS_ROOT:-../../../}/lib/gitea:/data
     networks: [net_internal]
     labels:
       - traefik.enable=true

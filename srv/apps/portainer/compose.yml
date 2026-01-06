@@ -4,11 +4,11 @@ services:
     container_name: portainer
     restart: unless-stopped
     env_file:
-      - ${OPS_ROOT:-../../}/etc/global.env
-      - ${OPS_ROOT:-../../}/etc/srv/apps.portainer.env
+      - ${OPS_ROOT:-../../../}/etc/global.env
+      - ${OPS_ROOT:-../../../}/etc/srv/apps.portainer.env
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - ${OPS_ROOT:-../../}/lib/portainer:/data
+      - ${OPS_ROOT:-../../../}/lib/portainer:/data
     networks: [net_internal]
     labels:
       - traefik.enable=true

@@ -4,7 +4,7 @@ services:
     container_name: mosquitto
     restart: unless-stopped
     volumes:
-      - ${OPS_ROOT:-../../}/lib/teslamate/mosquitto:/mosquitto
+      - ${OPS_ROOT:-../../../}/lib/teslamate/mosquitto:/mosquitto
     networks: [net_internal]
 
   teslamate:
@@ -12,8 +12,8 @@ services:
     container_name: teslamate
     restart: unless-stopped
     env_file:
-      - ${OPS_ROOT:-../../}/etc/global.env
-      - ${OPS_ROOT:-../../}/etc/srv/apps.teslamate.env
+      - ${OPS_ROOT:-../../../}/etc/global.env
+      - ${OPS_ROOT:-../../../}/etc/srv/apps.teslamate.env
     networks: [net_internal]
     depends_on:
       - mosquitto

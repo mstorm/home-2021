@@ -4,8 +4,8 @@ services:
     container_name: zitadel
     restart: unless-stopped
     env_file:
-      - ${OPS_ROOT:-../../}/etc/global.env
-      - ${OPS_ROOT:-../../}/etc/srv/foundation.zitadel.env
+      - ${OPS_ROOT:-../../../}/etc/global.env
+      - ${OPS_ROOT:-../../../}/etc/srv/foundation.zitadel.env
     networks:
       - net_internal
     labels:

@@ -4,10 +4,10 @@ services:
     container_name: vaultwarden
     restart: unless-stopped
     env_file:
-      - ${OPS_ROOT:-../../}/etc/global.env
-      - ${OPS_ROOT:-../../}/etc/srv/apps.vaultwarden.env
+      - ${OPS_ROOT:-../../../}/etc/global.env
+      - ${OPS_ROOT:-../../../}/etc/srv/apps.vaultwarden.env
     volumes:
-      - ${OPS_ROOT:-../../}/lib/vaultwarden:/data
+      - ${OPS_ROOT:-../../../}/lib/vaultwarden:/data
     networks: [net_internal]
     labels:
       - traefik.enable=true

@@ -4,8 +4,8 @@ services:
     container_name: traefik
     restart: unless-stopped
     env_file:
-      - ${OPS_ROOT:-../../}/etc/global.env
-      - ${OPS_ROOT:-../../}/etc/srv/edge.traefik.env
+      - ${OPS_ROOT:-../../../}/etc/global.env
+      - ${OPS_ROOT:-../../../}/etc/srv/edge.traefik.env
     command:
       - --api.dashboard=true
       - --providers.docker=true
@@ -23,8 +23,8 @@ services:
       - "443:443"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - ${OPS_ROOT:-../../}/srv/edge/traefik/dynamic:/etc/traefik/dynamic:ro
-      - ${OPS_ROOT:-../../}/lib/traefik:/acme
+      - ${OPS_ROOT:-../../../}/srv/edge/traefik/dynamic:/etc/traefik/dynamic:ro
+      - ${OPS_ROOT:-../../../}/lib/traefik:/acme
     networks:
       - net_external
       - net_internal

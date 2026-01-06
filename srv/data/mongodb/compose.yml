@@ -4,10 +4,10 @@ services:
     container_name: mongodb
     restart: unless-stopped
     env_file:
-      - ${OPS_ROOT:-../../}/etc/global.env
-      - ${OPS_ROOT:-../../}/etc/srv/data.mongodb.env
+      - ${OPS_ROOT:-../../../}/etc/global.env
+      - ${OPS_ROOT:-../../../}/etc/srv/data.mongodb.env
     volumes:
-      - ${OPS_ROOT:-../../}/lib/mongodb:/data/db
+      - ${OPS_ROOT:-../../../}/lib/mongodb:/data/db
     networks:
       - net_internal
     ports:

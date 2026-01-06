@@ -6,7 +6,7 @@ services:
     volumes:
       - /var/log:/var/log:ro
       - /var/lib/docker/containers:/var/lib/docker/containers:ro
-      - ${OPS_ROOT:-../../}/srv/observability/promtail/config/promtail.yml:/etc/promtail/config.yml:ro
+      - ${OPS_ROOT:-../../../}/srv/observability/promtail/config/promtail.yml:/etc/promtail/config.yml:ro
     command: ["-config.file=/etc/promtail/config.yml"]
     networks: [net_internal]
 

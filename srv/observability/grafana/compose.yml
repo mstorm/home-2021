@@ -4,10 +4,10 @@ services:
     container_name: grafana
     restart: unless-stopped
     env_file:
-      - ${OPS_ROOT:-../../}/etc/global.env
+      - ${OPS_ROOT:-../../../}/etc/global.env
     volumes:
-      - ${OPS_ROOT:-../../}/lib/grafana:/var/lib/grafana
-      - ${OPS_ROOT:-../../}/srv/observability/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ${OPS_ROOT:-../../../}/lib/grafana:/var/lib/grafana
+      - ${OPS_ROOT:-../../../}/srv/observability/grafana/provisioning:/etc/grafana/provisioning:ro
     networks: [net_internal]
     labels:
       - traefik.enable=true

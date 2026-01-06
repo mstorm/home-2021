@@ -4,11 +4,11 @@ services:
     container_name: headscale
     restart: unless-stopped
     env_file:
-      - ${OPS_ROOT:-../../}/etc/global.env
-      - ${OPS_ROOT:-../../}/etc/srv/foundation.headscale.env
+      - ${OPS_ROOT:-../../../}/etc/global.env
+      - ${OPS_ROOT:-../../../}/etc/srv/foundation.headscale.env
     volumes:
-      - ${OPS_ROOT:-../../}/lib/headscale:/var/lib/headscale
-      - ${OPS_ROOT:-../../}/srv/foundation/headscale/config:/etc/headscale:ro
+      - ${OPS_ROOT:-../../../}/lib/headscale:/var/lib/headscale
+      - ${OPS_ROOT:-../../../}/srv/foundation/headscale/config:/etc/headscale:ro
     networks:
       - net_internal
     labels:
