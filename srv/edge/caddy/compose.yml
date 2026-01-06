@@ -11,7 +11,9 @@ services:
       - CADDY_INGRESS_NETWORKS=net_external,net_internal
       - CADDY_DOCKER_CERTFILE=/data/caddy/certificates/acme-v02.api.letsencrypt.org-directory/*.crt
       - CADDY_DOCKER_CERTKEY=/data/caddy/certificates/acme-v02.api.letsencrypt.org-directory/*.key
-      - CADDYFILE_PATH=/etc/caddy/Caddyfile
+      - CADDYFILE_PATH=/data/Caddyfile
+      - CADDY_EMAIL=${LE_EMAIL}
+      - CLOUDFLARE_DNS_API_TOKEN=${CLOUDFLARE_DNS_API_TOKEN}
     ports:
       - "80:80"
       - "443:443"
@@ -20,7 +22,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ${OPS_ROOT:-../../../}/lib/caddy:/data
-      - ${OPS_ROOT:-../../../}/srv/edge/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - ${OPS_ROOT:-../../../}/srv/edge/caddy/Caddyfile:/data/Caddyfile:ro
     networks:
       - net_external
       - net_internal
