@@ -1,27 +1,6 @@
-# Caddyfile for caddy-docker-proxy
-# Docker labels are automatically converted to Caddyfile format
-# This file is optional and used for global settings
-
-# Admin API (for monitoring and configuration)
-# Access via: http://localhost:2019/config/ or http://caddy.home.mstorm.net:2019/config/
 {
 	admin localhost:2019
 	email mstorm@mstorm.net
 	acme_dns cloudflare {env.CLOUDFLARE_DNS_API_TOKEN}
-}
-
-# Caddy dashboard (optional, via admin API)
-caddy.home.mstorm.net {
-	reverse_proxy localhost:2019 {
-		header_up Host {host}
-		header_up X-Real-IP {remote}
-		header_up X-Forwarded-For {remote}
-		header_up X-Forwarded-Proto {scheme}
-	}
-}
-
-# Default catch-all (if no Docker labels match)
-:80 {
-	respond "Caddy is running" 200
 }
 

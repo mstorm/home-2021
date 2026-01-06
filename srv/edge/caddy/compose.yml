@@ -12,8 +12,6 @@ services:
       - CADDY_DOCKER_CERTFILE=/data/caddy/certificates/acme-v02.api.letsencrypt.org-directory/*.crt
       - CADDY_DOCKER_CERTKEY=/data/caddy/certificates/acme-v02.api.letsencrypt.org-directory/*.key
       - CADDYFILE_PATH=/data/Caddyfile
-      - CADDY_EMAIL=${LE_EMAIL}
-      - CLOUDFLARE_DNS_API_TOKEN=${CLOUDFLARE_DNS_API_TOKEN}
     ports:
       - "80:80"
       - "443:443"
