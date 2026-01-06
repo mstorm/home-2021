@@ -5,7 +5,7 @@ services:
     restart: unless-stopped
     command: ["redis-server", "--appendonly", "yes"]
     volumes:
-      - ${OPS_ROOT:-.}/lib/redis:/data
+      - ${OPS_ROOT:-../../}/lib/redis:/data
     networks:
       - net_internal
     ports:

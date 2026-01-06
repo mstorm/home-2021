@@ -4,10 +4,10 @@ services:
     container_name: n8n
     restart: unless-stopped
     env_file:
-      - ${OPS_ROOT:-.}/etc/global.env
-      - ${OPS_ROOT:-.}/etc/srv/apps.n8n.env
+      - ${OPS_ROOT:-../../}/etc/global.env
+      - ${OPS_ROOT:-../../}/etc/srv/apps.n8n.env
     volumes:
-      - ${OPS_ROOT:-.}/lib/n8n:/home/node/.n8n
+      - ${OPS_ROOT:-../../}/lib/n8n:/home/node/.n8n
     networks: [net_internal]
     labels:
       - traefik.enable=true

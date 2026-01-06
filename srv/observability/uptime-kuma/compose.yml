@@ -4,7 +4,7 @@ services:
     container_name: uptime-kuma
     restart: unless-stopped
     volumes:
-      - ${OPS_ROOT:-.}/lib/uptime-kuma:/app/data
+      - ${OPS_ROOT:-../../}/lib/uptime-kuma:/app/data
     networks: [net_internal]
     labels:
       - traefik.enable=true

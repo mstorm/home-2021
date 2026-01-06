@@ -4,12 +4,12 @@ services:
     container_name: registry
     restart: unless-stopped
     env_file:
-      - ${OPS_ROOT:-.}/etc/global.env
-      - ${OPS_ROOT:-.}/etc/srv/apps.registry.env
+      - ${OPS_ROOT:-../../}/etc/global.env
+      - ${OPS_ROOT:-../../}/etc/srv/apps.registry.env
     environment:
       REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY: /var/lib/registry
     volumes:
-      - ${OPS_ROOT:-.}/lib/registry:/var/lib/registry
+      - ${OPS_ROOT:-../../}/lib/registry:/var/lib/registry
     networks: [net_internal]
     labels:
       - traefik.enable=true

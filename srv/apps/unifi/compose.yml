@@ -4,10 +4,10 @@ services:
     container_name: unifi-db
     restart: unless-stopped
     env_file:
-      - ${OPS_ROOT:-.}/etc/global.env
-      - ${OPS_ROOT:-.}/etc/srv/apps.unifi-db.env
+      - ${OPS_ROOT:-../../}/etc/global.env
+      - ${OPS_ROOT:-../../}/etc/srv/apps.unifi-db.env
     volumes:
-      - ${OPS_ROOT:-.}/lib/unifi-mongodb:/data/db
+      - ${OPS_ROOT:-../../}/lib/unifi-mongodb:/data/db
     network_mode: host
     command: mongod --bind_ip 127.0.0.1
 
@@ -19,7 +19,7 @@ services:
     depends_on:
       - unifi-db
     env_file:
-      - ${OPS_ROOT:-.}/etc/global.env
-      - ${OPS_ROOT:-.}/etc/srv/apps.unifi.env
+      - ${OPS_ROOT:-../../}/etc/global.env
+      - ${OPS_ROOT:-../../}/etc/srv/apps.unifi.env
     volumes:
-      - ${OPS_ROOT:-.}/lib/unifi:/config
+      - ${OPS_ROOT:-../../}/lib/unifi:/config
