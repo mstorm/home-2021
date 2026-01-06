@@ -5,6 +5,7 @@ services:
     restart: unless-stopped
     env_file:
       - ${OPS_ROOT:-../../../}/etc/global.env
+      - ${OPS_ROOT:-../../../}/etc/srv/observability.grafana.env
     volumes:
       - ${OPS_ROOT:-../../../}/lib/grafana:/var/lib/grafana
       - ${OPS_ROOT:-../../../}/srv/observability/grafana/provisioning:/etc/grafana/provisioning:ro

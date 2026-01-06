@@ -3,6 +3,9 @@ services:
     image: prom/prometheus:latest
     container_name: prometheus
     restart: unless-stopped
+    env_file:
+      - ${OPS_ROOT:-../../../}/etc/global.env
+      - ${OPS_ROOT:-../../../}/etc/srv/observability.prometheus.env
     volumes:
       - ${OPS_ROOT:-../../../}/srv/observability/prometheus/config/prometheus.yml:/etc/prometheus/prometheus.yml:ro
       - ${OPS_ROOT:-../../../}/lib/prometheus:/prometheus
