@@ -8,8 +8,8 @@ services:
       - ${OPS_ROOT:-.}/etc/srv/edge.cloudflared.env
     command: >
       sh -c "
-      if [ -n \"$$TUNNEL_TOKEN\" ]; then
-        tunnel --no-autoupdate run $$TUNNEL_TOKEN
+      if [ -n \"$${TUNNEL_TOKEN:-}\" ]; then
+        tunnel --no-autoupdate run --token \"$$TUNNEL_TOKEN\" --config /etc/cloudflared/config.yml
       else
         tunnel --no-autoupdate run --config /etc/cloudflared/config.yml
       fi
