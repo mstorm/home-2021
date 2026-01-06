@@ -15,7 +15,4 @@ fi
 mkdir -p "$ROOT/run"/{tmp,lock,logs,state}
 mkdir -p "$ROOT/lib/cloudflared"
 
-# Ensure config directory exists
-mkdir -p "$ROOT/srv/edge/cloudflared/config"
-
 echo "init ok: edge/cloudflared"

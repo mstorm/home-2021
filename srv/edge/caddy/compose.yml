@@ -17,6 +17,7 @@ services:
       - "80:80"
       - "443:443"
       - "443:443/udp"
+      - "2019:2019"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ${OPS_ROOT:-../../../}/lib/caddy:/data
