@@ -1,0 +1,19 @@
+http:
+  routers:
+    tls-bootstrap:
+      rule: Host(`tls-bootstrap.home.${DNS_NAME:-home.internal}`)
+      entryPoints: [websecure]
+      service: noop
+      tls:
+        certResolver: le-dns
+        domains:
+          - main: "home.${DNS_NAME:-home.internal}"
+            sans:
+              - "*.${DNS_NAME:-home.internal}"
+              - "*.home.${DNS_NAME:-home.internal}"
+
+  services:
+    noop:
+      loadBalancer:
+        servers:
+          - url: "http://127.0.0.1"

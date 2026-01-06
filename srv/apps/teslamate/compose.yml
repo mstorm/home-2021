@@ -1,0 +1,30 @@
+services:
+  mosquitto:
+    image: eclipse-mosquitto:2
+    container_name: mosquitto
+    restart: unless-stopped
+    volumes:
+      - ${OPS_ROOT:-.}/lib/teslamate/mosquitto:/mosquitto
+    networks: [net_internal]
+
+  teslamate:
+    image: teslamate/teslamate:latest
+    container_name: teslamate
+    restart: unless-stopped
+    env_file:
+      - ${OPS_ROOT:-.}/etc/global.env
+      - ${OPS_ROOT:-.}/etc/srv/apps.teslamate.env
+    networks: [net_internal]
+    depends_on:
+      - mosquitto
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.teslamate.rule=Host(`${TESLAMATE_HOST}`)
+      - traefik.http.routers.teslamate.entrypoints=websecure
+      - traefik.http.routers.teslamate.tls.certresolver=le-dns
+      - traefik.http.services.teslamate.loadbalancer.server.port=4000
+
+networks:
+  net_internal:
+    external: true
+    name: net_internal

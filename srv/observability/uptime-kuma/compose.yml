@@ -1,0 +1,19 @@
+services:
+  uptime-kuma:
+    image: louislam/uptime-kuma:latest
+    container_name: uptime-kuma
+    restart: unless-stopped
+    volumes:
+      - ${OPS_ROOT:-.}/lib/uptime-kuma:/app/data
+    networks: [net_internal]
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.uptime.rule=Host(`uptime.home.${DNS_NAME:-home.internal}`)
+      - traefik.http.routers.uptime.entrypoints=websecure
+      - traefik.http.routers.uptime.tls.certresolver=le-dns
+      - traefik.http.services.uptime.loadbalancer.server.port=3001
+
+networks:
+  net_internal:
+    external: true
+    name: net_internal

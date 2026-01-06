@@ -1,0 +1,24 @@
+services:
+  headscale:
+    image: headscale/headscale:latest
+    container_name: headscale
+    restart: unless-stopped
+    env_file:
+      - ${OPS_ROOT:-.}/etc/global.env
+      - ${OPS_ROOT:-.}/etc/srv/foundation.headscale.env
+    volumes:
+      - ${OPS_ROOT:-.}/lib/headscale:/var/lib/headscale
+      - ${OPS_ROOT:-.}/srv/foundation/headscale/config:/etc/headscale:ro
+    networks:
+      - net_internal
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.headscale.rule=Host(`${HEADSCALE_HOST}`)
+      - traefik.http.routers.headscale.entrypoints=websecure
+      - traefik.http.routers.headscale.tls.certresolver=le-dns
+      - traefik.http.services.headscale.loadbalancer.server.port=8080
+
+networks:
+  net_internal:
+    external: true
+    name: net_internal

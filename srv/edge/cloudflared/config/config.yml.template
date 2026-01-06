@@ -1,0 +1,24 @@
+credentials-file: /etc/cloudflared/creds/credentials.json
+
+ingress:
+  - hostname: id.${DNS_NAME:-home.internal}
+    service: https://traefik:443
+    originRequest:
+      noTLSVerify: true
+
+  - hostname: vault.${DNS_NAME:-home.internal}
+    service: https://traefik:443
+    originRequest:
+      noTLSVerify: true
+
+  - hostname: ztna.${DNS_NAME:-home.internal}
+    service: https://traefik:443
+    originRequest:
+      noTLSVerify: true
+
+  - hostname: aitne.${DNS_NAME:-home.internal}
+    service: https://traefik:443
+    originRequest:
+      noTLSVerify: true
+
+  - service: http_status:404

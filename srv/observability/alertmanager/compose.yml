@@ -1,0 +1,15 @@
+services:
+  alertmanager:
+    image: prom/alertmanager:latest
+    container_name: alertmanager
+    restart: unless-stopped
+    volumes:
+      - ${OPS_ROOT:-.}/srv/observability/alertmanager/config/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+      - ${OPS_ROOT:-.}/lib/alertmanager:/alertmanager
+    command: ["--config.file=/etc/alertmanager/alertmanager.yml"]
+    networks: [net_internal]
+
+networks:
+  net_internal:
+    external: true
+    name: net_internal

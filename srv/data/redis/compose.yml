@@ -1,0 +1,17 @@
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - ${OPS_ROOT:-.}/lib/redis:/data
+    networks:
+      - net_internal
+    ports:
+      - "127.0.0.1:6379:6379"
+
+networks:
+  net_internal:
+    external: true
+    name: net_internal

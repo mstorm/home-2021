@@ -1,0 +1,38 @@
+services:
+  traefik:
+    image: traefik:v3.6
+    container_name: traefik
+    restart: unless-stopped
+    env_file:
+      - ${OPS_ROOT:-.}/etc/global.env
+      - ${OPS_ROOT:-.}/etc/srv/edge.traefik.env
+    command:
+      - --api.dashboard=true
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+      - --providers.file.directory=/etc/traefik/dynamic
+      - --providers.file.watch=true
+      - --entrypoints.web.address=:80
+      - --entrypoints.websecure.address=:443
+      - --certificatesresolvers.le-dns.acme.email=${LE_EMAIL}
+      - --certificatesresolvers.le-dns.acme.storage=/acme/acme.json
+      - --certificatesresolvers.le-dns.acme.dnschallenge=true
+      - --certificatesresolvers.le-dns.acme.dnschallenge.provider=cloudflare
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ${OPS_ROOT:-.}/srv/edge/traefik/dynamic:/etc/traefik/dynamic:ro
+      - ${OPS_ROOT:-.}/lib/traefik:/acme
+    networks:
+      - net_external
+      - net_internal
+
+networks:
+  net_external:
+    external: true
+    name: net_external
+  net_internal:
+    external: true
+    name: net_internal

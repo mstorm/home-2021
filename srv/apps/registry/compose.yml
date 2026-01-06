@@ -1,0 +1,24 @@
+services:
+  registry:
+    image: registry:2
+    container_name: registry
+    restart: unless-stopped
+    env_file:
+      - ${OPS_ROOT:-.}/etc/global.env
+      - ${OPS_ROOT:-.}/etc/srv/apps.registry.env
+    environment:
+      REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY: /var/lib/registry
+    volumes:
+      - ${OPS_ROOT:-.}/lib/registry:/var/lib/registry
+    networks: [net_internal]
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.registry.rule=Host(`${REGISTRY_HOST}`)
+      - traefik.http.routers.registry.entrypoints=websecure
+      - traefik.http.routers.registry.tls.certresolver=le-dns
+      - traefik.http.services.registry.loadbalancer.server.port=5000
+
+networks:
+  net_internal:
+    external: true
+    name: net_internal

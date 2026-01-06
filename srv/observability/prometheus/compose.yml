@@ -1,0 +1,14 @@
+services:
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    restart: unless-stopped
+    volumes:
+      - ${OPS_ROOT:-.}/srv/observability/prometheus/config/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ${OPS_ROOT:-.}/lib/prometheus:/prometheus
+    networks: [net_internal]
+
+networks:
+  net_internal:
+    external: true
+    name: net_internal

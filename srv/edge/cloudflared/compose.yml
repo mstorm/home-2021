@@ -1,0 +1,26 @@
+services:
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflared
+    restart: unless-stopped
+    env_file:
+      - ${OPS_ROOT:-.}/etc/global.env
+      - ${OPS_ROOT:-.}/etc/srv/edge.cloudflared.env
+    command: >
+      sh -c "
+      if [ -n \"$$TUNNEL_TOKEN\" ]; then
+        tunnel --no-autoupdate run
+      else
+        tunnel --no-autoupdate run --config /etc/cloudflared/config.yml
+      fi
+      "
+    volumes:
+      - ${OPS_ROOT:-.}/srv/edge/cloudflared/config:/etc/cloudflared:ro
+      - ${OPS_ROOT:-.}/lib/cloudflared:/etc/cloudflared/creds:ro
+    networks:
+      - net_external
+
+networks:
+  net_external:
+    external: true
+    name: net_external

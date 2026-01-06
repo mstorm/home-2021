@@ -1,0 +1,11 @@
+/etc/**/*.env
+!/etc/**/*.env.example
+
+/lib/**
+/run/**
+/shared/**
+
+# Generated config files (from templates)
+srv/edge/traefik/dynamic/*.yml
+!srv/edge/traefik/dynamic/*.yml.template
+srv/edge/cloudflared/config/config.yml

@@ -1,0 +1,52 @@
+http:
+  routers:
+    id:
+      rule: Host(`id.${DNS_NAME:-home.internal}`)
+      entryPoints: [websecure]
+      service: zitadel
+      tls:
+        certResolver: le-dns
+
+    vault:
+      rule: Host(`vault.${DNS_NAME:-home.internal}`)
+      entryPoints: [websecure]
+      service: vaultwarden
+      tls:
+        certResolver: le-dns
+
+    ztna:
+      rule: Host(`ztna.${DNS_NAME:-home.internal}`)
+      entryPoints: [websecure]
+      service: headscale
+      tls:
+        certResolver: le-dns
+
+    aitne:
+      rule: Host(`aitne.${DNS_NAME:-home.internal}`)
+      entryPoints: [websecure]
+      service: aitne_dsm
+      tls:
+        certResolver: le-dns
+
+  services:
+    zitadel:
+      loadBalancer:
+        servers:
+          - url: "http://zitadel:8080"
+
+    vaultwarden:
+      loadBalancer:
+        servers:
+          - url: "http://vaultwarden:80"
+
+    headscale:
+      loadBalancer:
+        servers:
+          - url: "http://headscale:8080"
+
+    # Change NAS IP/port as needed (recommended: DSM HTTP 5000 behind Traefik)
+    aitne_dsm:
+      loadBalancer:
+        servers:
+          - url: "http://192.168.4.16:5000"
+

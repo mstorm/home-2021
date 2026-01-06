@@ -1,0 +1,20 @@
+services:
+  mongodb:
+    image: mongo:7.0
+    container_name: mongodb
+    restart: unless-stopped
+    env_file:
+      - ${OPS_ROOT:-.}/etc/global.env
+      - ${OPS_ROOT:-.}/etc/srv/data.mongodb.env
+    volumes:
+      - ${OPS_ROOT:-.}/lib/mongodb:/data/db
+    networks:
+      - net_internal
+    ports:
+      - "127.0.0.1:27017:27017"
+
+networks:
+  net_internal:
+    external: true
+    name: net_internal
+

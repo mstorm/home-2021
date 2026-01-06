@@ -1,0 +1,22 @@
+services:
+  gitea:
+    image: gitea/gitea:latest
+    container_name: gitea
+    restart: unless-stopped
+    env_file:
+      - ${OPS_ROOT:-.}/etc/global.env
+      - ${OPS_ROOT:-.}/etc/srv/apps.gitea.env
+    volumes:
+      - ${OPS_ROOT:-.}/lib/gitea:/data
+    networks: [net_internal]
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.gitea.rule=Host(`${GITEA_HOST}`)
+      - traefik.http.routers.gitea.entrypoints=websecure
+      - traefik.http.routers.gitea.tls.certresolver=le-dns
+      - traefik.http.services.gitea.loadbalancer.server.port=3000
+
+networks:
+  net_internal:
+    external: true
+    name: net_internal
