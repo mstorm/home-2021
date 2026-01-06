@@ -1,28 +1,28 @@
 http:
   routers:
     id:
-      rule: Host(`id.${DNS_NAME:-home.internal}`)
+      rule: Host(`id.${DNS_NAME:-home.internal}`, `id.${PARENT_DNS_NAME:-internal}`)
       entryPoints: [websecure]
       service: zitadel
       tls:
         certResolver: le-dns
 
     vault:
-      rule: Host(`vault.${DNS_NAME:-home.internal}`)
+      rule: Host(`vault.${DNS_NAME:-home.internal}`, `vault.${PARENT_DNS_NAME:-internal}`)
       entryPoints: [websecure]
       service: vaultwarden
       tls:
         certResolver: le-dns
 
     ztna:
-      rule: Host(`ztna.${DNS_NAME:-home.internal}`)
+      rule: Host(`ztna.${DNS_NAME:-home.internal}`, `ztna.${PARENT_DNS_NAME:-internal}`)
       entryPoints: [websecure]
       service: headscale
       tls:
         certResolver: le-dns
 
     aitne:
-      rule: Host(`aitne.${DNS_NAME:-home.internal}`)
+      rule: Host(`aitne.${DNS_NAME:-home.internal}`, `aitne.${PARENT_DNS_NAME:-internal}`)
       entryPoints: [websecure]
       service: aitne_dsm
       tls:
