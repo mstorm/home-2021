@@ -1,0 +1,9 @@
+# Caddyfile for caddy-docker-proxy
+# Docker labels are automatically converted to Caddyfile format
+# This file is optional and used for global settings
+
+# Default catch-all (if no Docker labels match)
+:80 {
+	respond "Caddy is running" 200
+}
+

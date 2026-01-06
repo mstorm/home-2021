@@ -10,11 +10,8 @@ services:
       - ${OPS_ROOT:-../../../}/lib/vaultwarden:/data
     networks: [net_internal]
     labels:
-      - traefik.enable=true
-      - traefik.http.routers.vaultwarden.rule=Host(`${VAULT_HOST}`)
-      - traefik.http.routers.vaultwarden.entrypoints=websecure
-      - traefik.http.routers.vaultwarden.tls.certresolver=le-dns
-      - traefik.http.services.vaultwarden.loadbalancer.server.port=80
+      - caddy=${VAULT_HOST}
+      - caddy.reverse_proxy=vaultwarden:80
 
 networks:
   net_internal:

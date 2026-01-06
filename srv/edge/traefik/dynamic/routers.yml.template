@@ -1,8 +1,0 @@
-http:
-  routers:
-    traefik:
-      rule: Host(`traefik.${DNS_NAME:-home.internal}`)
-      entryPoints: [websecure]
-      service: api@internal
-      tls:
-        certResolver: le-dns

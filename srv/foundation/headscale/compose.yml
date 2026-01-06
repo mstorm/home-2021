@@ -12,11 +12,8 @@ services:
     networks:
       - net_internal
     labels:
-      - traefik.enable=true
-      - traefik.http.routers.headscale.rule=Host(`${HEADSCALE_HOST}`)
-      - traefik.http.routers.headscale.entrypoints=websecure
-      - traefik.http.routers.headscale.tls.certresolver=le-dns
-      - traefik.http.services.headscale.loadbalancer.server.port=8080
+      - caddy=${HEADSCALE_HOST}
+      - caddy.reverse_proxy=headscale:8080
 
 networks:
   net_internal:

@@ -11,11 +11,15 @@ if [[ -f "$ROOT/etc/global.env" ]]; then
   set +a
 fi
 
+if [[ -f "$ROOT/etc/srv/edge.caddy.env" ]]; then
+  set -a
+  source "$ROOT/etc/srv/edge.caddy.env"
+  set +a
+fi
+
 # Ensure generic runtime dirs exist
 mkdir -p "$ROOT/run"/{tmp,lock,logs,state}
-mkdir -p "$ROOT/lib/cloudflared"
+mkdir -p "$ROOT/lib/caddy"/{config,data}
 
-# Ensure config directory exists
-mkdir -p "$ROOT/srv/edge/cloudflared/config"
+echo "init ok: edge/caddy"
 
-echo "init ok: edge/cloudflared"

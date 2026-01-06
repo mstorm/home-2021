@@ -1,0 +1,34 @@
+services:
+  caddy:
+    # Using caddy-docker-proxy which supports Docker labels
+    # Note: Cloudflare DNS challenge requires additional configuration
+    image: lucaslorentz/caddy-docker-proxy:latest
+    container_name: caddy
+    restart: unless-stopped
+    env_file:
+      - ${OPS_ROOT:-../../../}/etc/global.env
+      - ${OPS_ROOT:-../../../}/etc/srv/edge.caddy.env
+    environment:
+      - CADDY_INGRESS_NETWORKS=net_external,net_internal
+      - CADDY_DOCKER_CERTFILE=/data/caddy/certificates/acme-v02.api.letsencrypt.org-directory/*.crt
+      - CADDY_DOCKER_CERTKEY=/data/caddy/certificates/acme-v02.api.letsencrypt.org-directory/*.key
+      - CLOUDFLARE_DNS_API_TOKEN=${CLOUDFLARE_DNS_API_TOKEN}
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ${OPS_ROOT:-../../../}/lib/caddy:/data
+    networks:
+      - net_external
+      - net_internal
+
+networks:
+  net_external:
+    external: true
+    name: net_external
+  net_internal:
+    external: true
+    name: net_internal
+

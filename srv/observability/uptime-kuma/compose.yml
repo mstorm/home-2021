@@ -7,11 +7,8 @@ services:
       - ${OPS_ROOT:-../../../}/lib/uptime-kuma:/app/data
     networks: [net_internal]
     labels:
-      - traefik.enable=true
-      - traefik.http.routers.uptime.rule=Host(`uptime.home.${DNS_NAME:-home.internal}`)
-      - traefik.http.routers.uptime.entrypoints=websecure
-      - traefik.http.routers.uptime.tls.certresolver=le-dns
-      - traefik.http.services.uptime.loadbalancer.server.port=3001
+      - caddy=uptime.home.mstorm.net
+      - caddy.reverse_proxy=uptime-kuma:3001
 
 networks:
   net_internal:

@@ -18,11 +18,8 @@ services:
     depends_on:
       - mosquitto
     labels:
-      - traefik.enable=true
-      - traefik.http.routers.teslamate.rule=Host(`${TESLAMATE_HOST}`)
-      - traefik.http.routers.teslamate.entrypoints=websecure
-      - traefik.http.routers.teslamate.tls.certresolver=le-dns
-      - traefik.http.services.teslamate.loadbalancer.server.port=4000
+      - caddy=${TESLAMATE_HOST}
+      - caddy.reverse_proxy=teslamate:4000
 
 networks:
   net_internal:

@@ -12,11 +12,8 @@ services:
       - ${OPS_ROOT:-../../../}/lib/registry:/var/lib/registry
     networks: [net_internal]
     labels:
-      - traefik.enable=true
-      - traefik.http.routers.registry.rule=Host(`${REGISTRY_HOST}`)
-      - traefik.http.routers.registry.entrypoints=websecure
-      - traefik.http.routers.registry.tls.certresolver=le-dns
-      - traefik.http.services.registry.loadbalancer.server.port=5000
+      - caddy=${REGISTRY_HOST}
+      - caddy.reverse_proxy=registry:5000
 
 networks:
   net_internal:

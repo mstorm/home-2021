@@ -9,11 +9,8 @@ services:
     networks:
       - net_internal
     labels:
-      - traefik.enable=true
-      - traefik.http.routers.zitadel.rule=Host(`${ZITADEL_HOST}`)
-      - traefik.http.routers.zitadel.entrypoints=websecure
-      - traefik.http.routers.zitadel.tls.certresolver=le-dns
-      - traefik.http.services.zitadel.loadbalancer.server.port=${ZITADEL_INTERNAL_PORT}
+      - caddy=${ZITADEL_HOST}
+      - caddy.reverse_proxy=zitadel:${ZITADEL_INTERNAL_PORT}
     # NOTE: ZITADEL command/config is version-specific. Fill via env/command as per official docs.
 
 networks:

@@ -10,11 +10,8 @@ services:
       - ${OPS_ROOT:-../../../}/lib/gitea:/data
     networks: [net_internal]
     labels:
-      - traefik.enable=true
-      - traefik.http.routers.gitea.rule=Host(`${GITEA_HOST}`)
-      - traefik.http.routers.gitea.entrypoints=websecure
-      - traefik.http.routers.gitea.tls.certresolver=le-dns
-      - traefik.http.services.gitea.loadbalancer.server.port=3000
+      - caddy=${GITEA_HOST}
+      - caddy.reverse_proxy=gitea:3000
 
 networks:
   net_internal:
