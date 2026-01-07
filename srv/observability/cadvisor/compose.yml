@@ -1,0 +1,29 @@
+services:
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    container_name: cadvisor
+    restart: unless-stopped
+    env_file:
+      - ${OPS_ROOT:-../../../}/etc/global.env
+      - ${OPS_ROOT:-../../../}/etc/srv/observability.cadvisor.env
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+      - /dev/disk/:/dev/disk:ro
+    devices:
+      - /dev/kmsg
+    networks: [net_internal]
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.cadvisor.rule=Host(`cadvisor.home.mstorm.net`)
+      - traefik.http.routers.cadvisor.entrypoints=websecure
+      - traefik.http.routers.cadvisor.tls=true
+      - traefik.http.services.cadvisor.loadbalancer.server.port=8080
+
+networks:
+  net_internal:
+    external: true
+    name: net_internal
+

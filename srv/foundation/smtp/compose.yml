@@ -1,0 +1,26 @@
+services:
+  smtp:
+    image: boky/postfix:latest
+    container_name: smtp
+    restart: unless-stopped
+    env_file:
+      - ${OPS_ROOT:-../../../}/etc/global.env
+      - ${OPS_ROOT:-../../../}/etc/srv/foundation.smtp.env
+    environment:
+      - ALLOWED_SENDER_DOMAINS=${SMTP_ALLOWED_DOMAINS:-}
+      - RELAYHOST=${SMTP_RELAYHOST:-}
+      - RELAYHOST_USERNAME=${SMTP_RELAYHOST_USERNAME:-}
+      - RELAYHOST_PASSWORD=${SMTP_RELAYHOST_PASSWORD:-}
+      - RELAYHOST_TLS=${SMTP_RELAYHOST_TLS:-yes}
+      - POSTFIX_myhostname=${SMTP_MYHOSTNAME:-smtp.home.mstorm.net}
+      - POSTFIX_mydomain=${SMTP_MYDOMAIN:-home.mstorm.net}
+      - POSTFIX_myorigin=${SMTP_MYORIGIN:-$mydomain}
+    ports:
+      - "${SMTP_PORT:-25}:25"
+    networks: [net_internal]
+
+networks:
+  net_internal:
+    external: true
+    name: net_internal
+

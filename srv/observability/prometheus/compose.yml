@@ -8,6 +8,7 @@ services:
       - ${OPS_ROOT:-../../../}/etc/srv/observability.prometheus.env
     volumes:
       - ${OPS_ROOT:-../../../}/srv/observability/prometheus/config/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ${OPS_ROOT:-../../../}/srv/observability/prometheus/config/rules:/etc/prometheus/rules:ro
       - ${OPS_ROOT:-../../../}/lib/prometheus:/prometheus
     networks: [net_internal]
 

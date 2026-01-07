@@ -1,0 +1,18 @@
+services:
+  watchtower:
+    image: containrrr/watchtower:latest
+    container_name: watchtower
+    restart: unless-stopped
+    env_file:
+      - ${OPS_ROOT:-../../../}/etc/global.env
+      - ${OPS_ROOT:-../../../}/etc/srv/observability.watchtower.env
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks: [net_internal]
+    command: --interval ${WATCHTOWER_INTERVAL:-24h} --cleanup
+
+networks:
+  net_internal:
+    external: true
+    name: net_internal
+

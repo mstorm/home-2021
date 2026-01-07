@@ -1,0 +1,23 @@
+services:
+  dozzle:
+    image: amir20/dozzle:latest
+    container_name: dozzle
+    restart: unless-stopped
+    env_file:
+      - ${OPS_ROOT:-../../../}/etc/global.env
+      - ${OPS_ROOT:-../../../}/etc/srv/observability.dozzle.env
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks: [net_internal]
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.dozzle.rule=Host(`${DOZZLE_HOST:-dozzle.home.mstorm.net}`)
+      - traefik.http.routers.dozzle.entrypoints=websecure
+      - traefik.http.routers.dozzle.tls=true
+      - traefik.http.services.dozzle.loadbalancer.server.port=8080
+
+networks:
+  net_internal:
+    external: true
+    name: net_internal
+
