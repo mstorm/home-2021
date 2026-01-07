@@ -5,9 +5,12 @@ RUN apk add --no-cache \
     build-base \
     git \
     postgresql-dev \
+    musl-dev \
     && git clone --branch v0.5.1 https://github.com/pgvector/pgvector.git /tmp/pgvector \
     && cd /tmp/pgvector \
     && make \
     && make install \
-    && apk del build-base git
+    && cd / \
+    && rm -rf /tmp/pgvector \
+    && apk del build-base git musl-dev
 
