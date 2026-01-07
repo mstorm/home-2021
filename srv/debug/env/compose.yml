@@ -1,7 +1,7 @@
 services:
-  test-env:
+  env:
     image: alpine:latest
-    container_name: test-env
+    container_name: env
     restart: "no"
     env_file:
       - ${OPS_ROOT:-../../../}/etc/global.env
@@ -18,5 +18,5 @@ services:
         echo "=== All env vars (filtered) ==="
         env | grep -E "(LE_EMAIL|CLOUDFLARE|DNS_NAME|TZ)" | sort
         echo ""
-        echo "=== Test complete ==="
+        echo "=== Environment check complete ==="
 

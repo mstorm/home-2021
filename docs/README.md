@@ -89,14 +89,14 @@ This command runs each service's `init.sh` in the following order:
 
 ### 6. Service Deployment
 
-Run the `deploy` command to deploy services:
+Run the `up` command to deploy services:
 
 ```bash
 # Deploy all services
-./ops.sh deploy
+./ops.sh up all
 
 # Deploy specific service only
-./ops.sh deploy edge/traefik
+./ops.sh up edge/traefik
 ```
 
 The deployment order is the same as the initialization order.
@@ -115,7 +115,17 @@ Traefik is configured to automatically obtain Let's Encrypt certificates. See [t
 - Do NOT expose the Traefik dashboard to the internet.
 - Ensure the ACME storage file (`lib/traefik/acme.json`) has permissions set to 600.
 
-### 8. Validation
+### 8. Environment Variable Verification
+
+To verify environment variables are loaded correctly:
+
+```bash
+./ops.sh up debug/env
+```
+
+This will start a temporary container that displays all environment variables from `etc/global.env`.
+
+### 9. Validation
 
 To validate each service's `compose.yml` file:
 
@@ -128,7 +138,7 @@ Example:
 ./ops.sh validate edge/traefik
 ```
 
-### 9. Stopping Services
+### 10. Stopping Services
 
 To stop services:
 

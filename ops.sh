@@ -298,8 +298,8 @@ cmd_up() {
     echo "Example: $0 up all"
     echo "Example: $0 up edge/traefik"
     echo "Example: $0 up traefik"
-    echo "Example: $0 up test --follow"
-    echo "Example: $0 up --follow test"
+    echo "Example: $0 up debug/env --follow"
+    echo "Example: $0 up --follow debug/env"
     exit 2
   fi
   

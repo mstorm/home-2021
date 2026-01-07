@@ -89,14 +89,14 @@ cp etc/srv/edge.cloudflared.env.example etc/srv/edge.cloudflared.env
 
 ### 6. 서비스 배포
 
-`deploy` 명령을 실행하여 서비스를 배포합니다:
+`up` 명령을 실행하여 서비스를 배포합니다:
 
 ```bash
 # 모든 서비스 배포
-./ops.sh deploy
+./ops.sh up all
 
 # 특정 서비스만 배포
-./ops.sh deploy edge/traefik
+./ops.sh up edge/traefik
 ```
 
 배포 순서는 초기화 순서와 동일합니다.
@@ -115,7 +115,17 @@ Traefik이 Let's Encrypt 인증서를 자동으로 획득하도록 설정되어 
 - Traefik 대시보드를 인터넷에 노출하지 마세요.
 - ACME 저장소 파일(`lib/traefik/acme.json`)의 권한이 600으로 설정되어 있는지 확인하세요.
 
-### 8. 검증
+### 8. 환경 변수 확인
+
+환경 변수가 올바르게 로드되었는지 확인하려면:
+
+```bash
+./ops.sh up debug/env
+```
+
+이 명령은 `etc/global.env`의 모든 환경 변수를 표시하는 임시 컨테이너를 시작합니다.
+
+### 9. 검증
 
 각 서비스의 `compose.yml` 파일을 검증하려면:
 
@@ -128,7 +138,7 @@ Traefik이 Let's Encrypt 인증서를 자동으로 획득하도록 설정되어 
 ./ops.sh validate edge/traefik
 ```
 
-### 9. 서비스 중지
+### 10. 서비스 중지
 
 서비스를 중지하려면:
 
