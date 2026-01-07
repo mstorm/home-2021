@@ -6,29 +6,16 @@ services:
     env_file:
       - ${OPS_ROOT:-../../../}/etc/global.env
     command:
-      - --api.dashboard=true
-      - --api.insecure=true
-      - --providers.docker=true
-      - --providers.docker.exposedbydefault=false
-      - --providers.docker.network=net_external
-      - --providers.docker.endpoint=unix:///var/run/docker.sock
-      - --entrypoints.web.address=:80
-      - --entrypoints.websecure.address=:443
-      - --entrypoints.web.http.redirections.entrypoint.to=websecure
-      - --entrypoints.web.http.redirections.entrypoint.scheme=https
-      - --providers.file.filename=/data/certs.yml
-      - --providers.file.watch=true
+      - --configfile=/config/traefik.yml
     ports:
       - "80:80"
       - "443:443"
-      - "8080:8080"
+      - "8880:8080"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ${OPS_ROOT:-../../../}/lib/traefik:/data
       - ${OPS_ROOT:-../../../}/lib/certs:/certs:ro
-      - ${OPS_ROOT:-../../../}/srv/edge/traefik/certs.yml:/data/certs.yml:ro
-    environment:
-      - CF_DNS_API_TOKEN=${CLOUDFLARE_DNS_API_TOKEN}
+      - ${OPS_ROOT:-../../../}/srv/edge/traefik/config:/config:ro
     networks:
       - net_external
       - net_internal

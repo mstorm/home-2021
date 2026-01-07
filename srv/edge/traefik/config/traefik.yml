@@ -1,0 +1,25 @@
+api:
+  dashboard: true
+  insecure: true
+
+providers:
+  docker:
+    enabled: true
+    exposedByDefault: false
+    network: net_external
+    endpoint: unix:///var/run/docker.sock
+  file:
+    filename: /config/certs.yml
+    watch: true
+
+entryPoints:
+  web:
+    address: ":80"
+    http:
+      redirections:
+        entryPoint:
+          to: websecure
+          scheme: https
+  websecure:
+    address: ":443"
+
