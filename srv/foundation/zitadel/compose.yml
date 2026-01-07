@@ -3,9 +3,13 @@ services:
     image: ghcr.io/zitadel/zitadel:latest
     container_name: zitadel
     restart: unless-stopped
+    depends_on:
+      - postgres
     env_file:
       - ${OPS_ROOT:-../../../}/etc/global.env
       - ${OPS_ROOT:-../../../}/etc/srv/foundation.zitadel.env
+    volumes:
+      - ${OPS_ROOT:-../../../}/lib/zitadel:/zitadel
     networks:
       - net_internal
     labels:
