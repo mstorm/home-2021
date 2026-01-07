@@ -16,9 +16,12 @@ services:
       - --domains=mstorm.net
       - --domains=*.mstorm.net
       - --domains=*.home.mstorm.net
+      - --run-hook=/hooks/reload-traefik.sh
       - run
     volumes:
       - ${OPS_ROOT:-../../../}/lib/certs:/data
+      - ${OPS_ROOT:-../../../}/srv/edge/lego/reload-traefik.sh:/hooks/reload-traefik.sh:ro
+      - ${OPS_ROOT:-../../../}/srv/edge/traefik/config:/config:rw
     networks:
       - net_internal
 
