@@ -4,7 +4,6 @@ api:
 
 providers:
   docker:
-    enabled: true
     exposedByDefault: false
     network: net_external
     endpoint: unix:///var/run/docker.sock
