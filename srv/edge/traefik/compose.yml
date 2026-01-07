@@ -16,7 +16,7 @@ services:
       - --entrypoints.websecure.address=:443
       - --entrypoints.web.http.redirections.entrypoint.to=websecure
       - --entrypoints.web.http.redirections.entrypoint.scheme=https
-      - --providers.file.filename=/certs/certs.yml
+      - --providers.file.filename=/data/certs.yml
       - --providers.file.watch=true
     ports:
       - "80:80"
@@ -26,7 +26,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ${OPS_ROOT:-../../../}/lib/traefik:/data
       - ${OPS_ROOT:-../../../}/lib/certs:/certs:ro
-      - ${OPS_ROOT:-../../../}/srv/edge/traefik/certs.yml:/certs/certs.yml:ro
+      - ${OPS_ROOT:-../../../}/srv/edge/traefik/certs.yml:/data/certs.yml:ro
     environment:
       - CF_DNS_API_TOKEN=${CLOUDFLARE_DNS_API_TOKEN}
     networks:
