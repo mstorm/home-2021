@@ -1,0 +1,7 @@
+tls:
+  certificates:
+    - certFile: /certs/certificates/mstorm.net.crt
+      keyFile: /certs/certificates/mstorm.net.key
+      stores:
+        - default
+
