@@ -35,10 +35,25 @@ if ! docker ps --format '{{.Names}}' | grep -q '^postgres$'; then
   exit 1
 fi
 
-# Generate new password
-echo "Generating a secure password for Zitadel database user..."
-ZITADEL_DATABASE_PASSWORD=$(tr -dc 'A-Za-z0-9!@#$%^&*' </dev/urandom | head -c 32)
-echo "✓ Password generated"
+# Store original password value to check if it was __REPLACE_ME__
+ZITADEL_DATABASE_PASSWORD_OLD="${ZITADEL_DATABASE_PASSWORD:-}"
+
+# Generate new password only if not set or set to __REPLACE_ME__
+if [ -z "${ZITADEL_DATABASE_PASSWORD:-}" ] || [ "${ZITADEL_DATABASE_PASSWORD}" = "__REPLACE_ME__" ]; then
+  echo "Generating a secure password for Zitadel database user..."
+  # Use openssl for reliable password generation (32 characters)
+  if command -v openssl >/dev/null 2>&1; then
+    # Generate 32 bytes and base64 encode, then take first 32 alphanumeric chars
+    ZITADEL_DATABASE_PASSWORD=$(openssl rand -base64 32 | tr -d "=+/" | tr -d '\n' | head -c 32)
+  else
+    # Fallback: use date + process ID + random for seed, then hash
+    SEED=$(date +%s%N)${$}$(od -An -N4 -tu4 /dev/urandom 2>/dev/null | tr -d ' ')
+    ZITADEL_DATABASE_PASSWORD=$(echo -n "$SEED" | sha256sum | cut -d' ' -f1 | head -c 32)
+  fi
+  echo "✓ Password generated"
+else
+  echo "Using existing password from environment file"
+fi
 
 POSTGRES_USER="${POSTGRES_USER:-postgres}"
 POSTGRES_PASSWORD="${POSTGRES_PASSWORD:-}"
@@ -53,15 +68,16 @@ else
   docker exec postgres psql -U "$POSTGRES_USER" -d postgres -c "CREATE DATABASE zitadel;"
 fi
 
-# Drop user if exists (to recreate with new password)
+# Create or update user
 if docker exec postgres psql -U "$POSTGRES_USER" -d postgres -tc "SELECT 1 FROM pg_roles WHERE rolname = 'zitadel'" | grep -q 1; then
-  echo "User 'zitadel' already exists, dropping and recreating..."
-  docker exec postgres psql -U "$POSTGRES_USER" -d postgres -c "DROP USER IF EXISTS zitadel;"
+  # User exists - update password
+  echo "User 'zitadel' already exists, updating password..."
+  docker exec postgres psql -U "$POSTGRES_USER" -d postgres -c "ALTER USER zitadel WITH PASSWORD '${ZITADEL_DATABASE_PASSWORD}';"
+else
+  # User doesn't exist - create new user
+  echo "Creating user 'zitadel' with password..."
+  docker exec postgres psql -U "$POSTGRES_USER" -d postgres -c "CREATE USER zitadel WITH PASSWORD '${ZITADEL_DATABASE_PASSWORD}';"
 fi
-
-# Create new user with generated password
-echo "Creating user 'zitadel' with new password..."
-docker exec postgres psql -U "$POSTGRES_USER" -d postgres -c "CREATE USER zitadel WITH PASSWORD '${ZITADEL_DATABASE_PASSWORD}';"
 
 # Grant privileges
 echo "Granting privileges..."
@@ -70,26 +86,28 @@ docker exec postgres psql -U "$POSTGRES_USER" -d zitadel -c "GRANT ALL ON SCHEMA
 docker exec postgres psql -U "$POSTGRES_USER" -d zitadel -c "ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO zitadel;"
 docker exec postgres psql -U "$POSTGRES_USER" -d zitadel -c "ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON SEQUENCES TO zitadel;"
 
-# Save password to foundation.zitadel.env
-ZITADEL_ENV_FILE="$ROOT/etc/srv/foundation.zitadel.env"
-echo ""
-echo "Saving password to $ZITADEL_ENV_FILE..."
+# Save password to foundation.zitadel.env only if we generated a new one
+if [ -z "${ZITADEL_DATABASE_PASSWORD_OLD:-}" ] || [ "${ZITADEL_DATABASE_PASSWORD_OLD}" = "__REPLACE_ME__" ]; then
+  ZITADEL_ENV_FILE="$ROOT/etc/srv/foundation.zitadel.env"
+  echo ""
+  echo "Saving password to $ZITADEL_ENV_FILE..."
 
-if grep -q "^ZITADEL_DATABASE_PASSWORD=" "$ZITADEL_ENV_FILE" 2>/dev/null; then
-  # Update existing password
-  if [[ "$OSTYPE" == "darwin"* ]]; then
-    # macOS sed
-    sed -i '' "s|^ZITADEL_DATABASE_PASSWORD=.*|ZITADEL_DATABASE_PASSWORD=$ZITADEL_DATABASE_PASSWORD|" "$ZITADEL_ENV_FILE"
+  if grep -q "^ZITADEL_DATABASE_PASSWORD=" "$ZITADEL_ENV_FILE" 2>/dev/null; then
+    # Update existing password
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+      # macOS sed
+      sed -i '' "s|^ZITADEL_DATABASE_PASSWORD=.*|ZITADEL_DATABASE_PASSWORD=$ZITADEL_DATABASE_PASSWORD|" "$ZITADEL_ENV_FILE"
+    else
+      # Linux sed
+      sed -i "s|^ZITADEL_DATABASE_PASSWORD=.*|ZITADEL_DATABASE_PASSWORD=$ZITADEL_DATABASE_PASSWORD|" "$ZITADEL_ENV_FILE"
+    fi
+    echo "✓ Updated existing ZITADEL_DATABASE_PASSWORD"
   else
-    # Linux sed
-    sed -i "s|^ZITADEL_DATABASE_PASSWORD=.*|ZITADEL_DATABASE_PASSWORD=$ZITADEL_DATABASE_PASSWORD|" "$ZITADEL_ENV_FILE"
+    # Append new password
+    echo "" >> "$ZITADEL_ENV_FILE"
+    echo "ZITADEL_DATABASE_PASSWORD=$ZITADEL_DATABASE_PASSWORD" >> "$ZITADEL_ENV_FILE"
+    echo "✓ Added ZITADEL_DATABASE_PASSWORD"
   fi
-  echo "✓ Updated existing ZITADEL_DATABASE_PASSWORD"
-else
-  # Append new password
-  echo "" >> "$ZITADEL_ENV_FILE"
-  echo "ZITADEL_DATABASE_PASSWORD=$ZITADEL_DATABASE_PASSWORD" >> "$ZITADEL_ENV_FILE"
-  echo "✓ Added ZITADEL_DATABASE_PASSWORD"
 fi
 
 echo ""
@@ -100,8 +118,12 @@ echo "  Database Configuration"
 echo "═══════════════════════════════════════════════════════════════"
 echo "  Database: zitadel"
 echo "  User:     zitadel"
-echo "  Password: $ZITADEL_DATABASE_PASSWORD"
-echo ""
-echo "✓ Password saved to etc/srv/foundation.zitadel.env"
+if [ -z "${ZITADEL_DATABASE_PASSWORD_OLD:-}" ] || [ "${ZITADEL_DATABASE_PASSWORD_OLD}" = "__REPLACE_ME__" ]; then
+  echo "  Password: $ZITADEL_DATABASE_PASSWORD"
+  echo ""
+  echo "✓ Password saved to etc/srv/foundation.zitadel.env"
+else
+  echo "  Password: (using existing password from environment file)"
+fi
 echo "═══════════════════════════════════════════════════════════════"
 
