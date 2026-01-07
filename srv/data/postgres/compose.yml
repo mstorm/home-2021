@@ -9,7 +9,7 @@ services:
       - ${OPS_ROOT:-../../../}/etc/global.env
       - ${OPS_ROOT:-../../../}/etc/srv/data.postgres.env
     volumes:
-      - ${OPS_ROOT:-../../../}/lib/postgres:/var/lib/postgresql/data
+      - ${OPS_ROOT:-../../../}/lib/postgres:/var/lib/postgresql
       - ${OPS_ROOT:-../../../}/srv/data/postgres/init-extensions.sql:/docker-entrypoint-initdb.d/init-extensions.sql:ro
     networks:
       - net_internal
