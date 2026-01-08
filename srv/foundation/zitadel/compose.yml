@@ -3,6 +3,7 @@ services:
     image: ghcr.io/zitadel/zitadel:latest
     container_name: zitadel
     restart: unless-stopped
+    user: "0"
     env_file:
       - ${OPS_ROOT:-../../../}/etc/global.env
       - ${OPS_ROOT:-../../../}/etc/srv/foundation.zitadel.env
@@ -10,13 +11,57 @@ services:
       - ${OPS_ROOT:-../../../}/lib/zitadel:/zitadel
     networks:
       - net_internal
+    command:
+      - sh
+      - -c
+      - |
+        exec zitadel "$${ZITADEL_COMMAND:-start}" --masterkey "$$ZITADEL_MASTERKEY"
+    healthcheck:
+      test:
+        - CMD
+        - /app/zitadel
+        - ready
+      interval: 10s
+      timeout: 60s
+      retries: 5
+      start_period: 10s
     labels:
       - traefik.enable=true
       - traefik.http.routers.zitadel.rule=Host(`${ZITADEL_HOST}`)
       - traefik.http.routers.zitadel.entrypoints=websecure
       - traefik.http.routers.zitadel.tls=true
       - traefik.http.services.zitadel.loadbalancer.server.port=${ZITADEL_INTERNAL_PORT}
-    # NOTE: ZITADEL command/config is version-specific. Fill via env/command as per official docs.
+    # NOTE: ZITADEL command options:
+    #   - start: starts ZITADEL (use after init/setup)
+    #   - start-from-init: cold start (init + setup + start)
+    #   - start-from-setup: start after init (setup + start)
+    # Set ZITADEL_COMMAND in foundation.zitadel.env to override default "start"
+
+  login:
+    image: ghcr.io/zitadel/zitadel-login:latest
+    container_name: zitadel-login
+    restart: unless-stopped
+    user: "0"
+    env_file:
+      - ${OPS_ROOT:-../../../}/etc/global.env
+      - ${OPS_ROOT:-../../../}/etc/srv/foundation.zitadel.env
+    environment:
+      - ZITADEL_API_URL=http://zitadel:8080
+      - NEXT_PUBLIC_BASE_PATH=/ui/v2/login
+      - ZITADEL_SERVICE_USER_TOKEN_FILE=/zitadel/login-client.pat
+    volumes:
+      - ${OPS_ROOT:-../../../}/lib/zitadel:/zitadel:ro
+    networks:
+      - net_internal
+    depends_on:
+      zitadel:
+        condition: service_healthy
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.zitadel-login.rule=Host(`${ZITADEL_HOST}`) && PathPrefix(`/ui/v2/login`)
+      - traefik.http.routers.zitadel-login.entrypoints=websecure
+      - traefik.http.routers.zitadel-login.tls=true
+      - traefik.http.services.zitadel-login.loadbalancer.server.port=3000
 
 networks:
   net_internal:
