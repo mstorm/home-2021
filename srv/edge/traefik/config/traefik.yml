@@ -21,3 +21,8 @@ entryPoints:
           scheme: https
   websecure:
     address: ":443"
+
+http:
+  serversTransports:
+    default:
+      insecureSkipVerify: true
