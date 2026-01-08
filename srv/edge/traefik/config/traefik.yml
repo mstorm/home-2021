@@ -26,3 +26,5 @@ http:
   serversTransports:
     default:
       insecureSkipVerify: true
+    unifi:
+      insecureSkipVerify: true
