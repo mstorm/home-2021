@@ -53,6 +53,7 @@ services:
       - traefik.http.routers.unifi.entrypoints=websecure
       - traefik.http.routers.unifi.tls=true
       - traefik.http.services.unifi.loadbalancer.server.port=8443
+      - traefik.http.services.unifi.loadbalancer.server.scheme=https
       - traefik.http.middlewares.unifi-headers.headers.customRequestHeaders.X-Forwarded-Proto=https
       - traefik.http.routers.unifi.middlewares=unifi-headers
 
