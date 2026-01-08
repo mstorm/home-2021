@@ -9,7 +9,7 @@ providers:
     network: net_external
     endpoint: unix:///var/run/docker.sock
   file:
-    filename: /config/certs.yml
+    directory: /config
     watch: true
 
 entryPoints:

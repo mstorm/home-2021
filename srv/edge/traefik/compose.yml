@@ -16,6 +16,8 @@ services:
       - ${OPS_ROOT:-../../../}/lib/traefik:/data
       - ${OPS_ROOT:-../../../}/lib/certs:/certs:ro
       - ${OPS_ROOT:-../../../}/srv/edge/traefik/config:/config:ro
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     labels:
       - traefik.enable=true
       - traefik.http.routers.traefik.rule=Host(`traefik.home.mstorm.net`)

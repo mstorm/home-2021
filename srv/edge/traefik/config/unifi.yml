@@ -1,0 +1,14 @@
+http:
+  routers:
+    unifi:
+      rule: "Host(`unifi.home.mstorm.net`)"
+      entryPoints:
+        - websecure
+      service: unifi
+      tls: {}
+
+  services:
+    unifi:
+      loadBalancer:
+        servers:
+          - url: "http://host.docker.internal:8443"
