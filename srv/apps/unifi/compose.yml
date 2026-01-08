@@ -1,4 +1,5 @@
 services:
+  # [1] 데이터베이스
   unifi-db:
     image: mongo:4.4
     container_name: unifi-db
@@ -8,21 +9,26 @@ services:
       - ${OPS_ROOT:-../../../}/etc/srv/apps.unifi.env
     volumes:
       - ${OPS_ROOT:-../../../}/lib/unifi/db:/data/db
+      - ${OPS_ROOT:-../../../}/srv/apps/unifi/init-mongo.sh:/docker-entrypoint-initdb.d/init-mongo.sh:ro
     networks:
       - net_internal
     ports:
       - "127.0.0.1:27017:27017"
 
-  unifi:
-    image: linuxserver/unifi-network-application:latest
-    container_name: unifi
+  # [2] UniFi 컨트롤러
+  unifi-controller:
+    image: lscr.io/linuxserver/unifi-network-application:latest
+    container_name: unifi-controller
     restart: unless-stopped
-    network_mode: host
     depends_on:
       - unifi-db
+    network_mode: host
     env_file:
       - ${OPS_ROOT:-../../../}/etc/global.env
       - ${OPS_ROOT:-../../../}/etc/srv/apps.unifi.env
+    environment:
+      - MONGO_HOST=127.0.0.1
+      - MONGO_PORT=27017
     volumes:
       - ${OPS_ROOT:-../../../}/lib/unifi:/config
 
