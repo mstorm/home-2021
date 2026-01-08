@@ -22,15 +22,32 @@ services:
     restart: unless-stopped
     depends_on:
       - unifi-db
-    network_mode: host
     env_file:
       - ${OPS_ROOT:-../../../}/etc/global.env
       - ${OPS_ROOT:-../../../}/etc/srv/apps.unifi.env
     environment:
-      - MONGO_HOST=127.0.0.1
+      - MONGO_HOST=unifi-db
       - MONGO_PORT=27017
     volumes:
       - ${OPS_ROOT:-../../../}/lib/unifi:/config
+    ports:
+      - "20443:8443"
+      - "8080:8080"
+      - "3478:3478/udp"
+      - "10001:10001/udp"
+      - "1900:1900/udp"
+      - "20843:8843"
+      - "20880:8880"
+      - "6789:6789"
+      - "5514:5514/udp"
+    networks:
+      - net_internal
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.unifi.rule=Host(`${UNIFI_HOST}`)
+      - traefik.http.routers.unifi.entrypoints=websecure
+      - traefik.http.routers.unifi.tls=true
+      - traefik.http.services.unifi.loadbalancer.server.port=8443
 
 networks:
   net_internal:
