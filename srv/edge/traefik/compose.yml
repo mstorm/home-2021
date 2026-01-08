@@ -5,8 +5,6 @@ services:
     restart: unless-stopped
     env_file:
       - ${OPS_ROOT:-../../../}/etc/global.env
-    environment:
-      - TRAEFIK_SERVERSTRANSPORTS_DEFAULT_INSECURESKIPVERIFY=true
     command:
       - --configfile=/config/traefik.yml
       - --api.disableDashboardAd=true
