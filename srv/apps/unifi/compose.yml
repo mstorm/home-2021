@@ -54,8 +54,8 @@ services:
       - traefik.http.routers.unifi.tls=true
       - traefik.http.services.unifi.loadbalancer.server.port=8443
       - traefik.http.services.unifi.loadbalancer.server.scheme=https
-      - traefik.http.middlewares.unifi-headers.headers.customRequestHeaders.X-Forwarded-Proto=https
-      - traefik.http.routers.unifi.middlewares=unifi-headers
+      - traefik.http.serversTransports.unifi-transport.insecureSkipVerify=true
+      - traefik.http.services.unifi.loadbalancer.server.transport=unifi-transport@docker
 
 networks:
   net_internal:
