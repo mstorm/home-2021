@@ -13,7 +13,13 @@ services:
     networks:
       - net_internal
     ports:
-      - "127.0.0.1:27017:27017"
+      - "127.0.0.1:27017:27017"  # 호스트에서만 접근 가능 (보안)
+    healthcheck:
+      test: ["CMD", "mongo", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
   # [2] UniFi 컨트롤러
   unifi-controller:
@@ -21,7 +27,8 @@ services:
     container_name: unifi-controller
     restart: unless-stopped
     depends_on:
-      - unifi-db
+      unifi-db:
+        condition: service_healthy
     env_file:
       - ${OPS_ROOT:-../../../}/etc/global.env
       - ${OPS_ROOT:-../../../}/etc/srv/apps.unifi.env
@@ -48,7 +55,8 @@ services:
       - traefik.http.routers.unifi.entrypoints=websecure
       - traefik.http.routers.unifi.tls=true
       - traefik.http.services.unifi.loadbalancer.server.port=8443
-      - traefik.http.services.unifi.loadbalancer.server.scheme=https
+      - traefik.http.middlewares.unifi-headers.headers.customRequestHeaders.X-Forwarded-Proto=https
+      - traefik.http.routers.unifi.middlewares=unifi-headers
 
 networks:
   net_internal:
