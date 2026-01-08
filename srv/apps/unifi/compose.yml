@@ -12,8 +12,6 @@ services:
       - ${OPS_ROOT:-../../../}/srv/apps/unifi/init-mongo.sh:/docker-entrypoint-initdb.d/init-mongo.sh:ro
     networks:
       - net_internal
-    ports:
-      - "127.0.0.1:27017:27017"  # 호스트에서만 접근 가능 (보안)
     healthcheck:
       test: ["CMD", "mongo", "--eval", "db.adminCommand('ping')"]
       interval: 10s
