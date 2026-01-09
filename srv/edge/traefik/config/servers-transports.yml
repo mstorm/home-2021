@@ -2,3 +2,5 @@ http:
   serversTransports:
     default:
       insecureSkipVerify: true
+    insecure:
+      insecureSkipVerify: true
