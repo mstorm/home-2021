@@ -49,12 +49,14 @@ services:
       - net_internal
     labels:
       - traefik.enable=true
+      - traefik.docker.network=net_internal
+      - traefik.http.serversTransports.unifi.insecureSkipVerify=true
       - traefik.http.routers.unifi.rule=Host(`${UNIFI_HOST}`)
       - traefik.http.routers.unifi.entrypoints=websecure
       - traefik.http.routers.unifi.tls=true
       - traefik.http.services.unifi.loadbalancer.server.port=8443
       - traefik.http.services.unifi.loadbalancer.server.scheme=https
-      - traefik.http.services.unifi.loadbalancer.server.transport=default@file
+      - traefik.http.services.unifi.loadbalancer.server.transport=unifi@docker
 
 networks:
   net_internal:
