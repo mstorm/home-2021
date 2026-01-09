@@ -9,6 +9,8 @@ providers:
     endpoint: unix:///var/run/docker.sock
     watch: true
     network: net_internal
+    tls:
+      insecureSkipVerify: true
   file:
     directory: /config
     watch: true
