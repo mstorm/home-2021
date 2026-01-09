@@ -7,6 +7,10 @@ providers:
   docker:
     exposedByDefault: false
     endpoint: unix:///var/run/docker.sock
+    watch: true
+    network: net_internal
+    tls:
+      insecureSkipVerify: true
   file:
     directory: /config
     watch: true
@@ -21,10 +25,3 @@ entryPoints:
           scheme: https
   websecure:
     address: ":443"
-
-http:
-  serversTransports:
-    default:
-      insecureSkipVerify: true
-    unifi:
-      insecureSkipVerify: true
