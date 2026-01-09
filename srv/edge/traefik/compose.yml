@@ -7,7 +7,7 @@ services:
       - ${OPS_ROOT:-../../../}/etc/global.env
     command:
       - --configfile=/config/traefik.yml
-      - --api.disableDashboardAd
+      - --api.disabledashboardad=true
     ports:
       - "80:80"
       - "443:443"
